@@ -1,0 +1,108 @@
+<mvc:View
+	controllerName="sap.ui.demo.basicTemplate.controller.ImportarArquivo"
+	displayBlock="true"
+	xmlns="sap.m"
+	xmlns:u="sap.ui.unified"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:mvc="sap.ui.core.mvc">
+	<Page id="page" 
+		title="{i18n>title-imp_arq}">
+		<content>
+			<u:FileUploader
+				id="fileUploader"
+				name="myFileUpload"
+				uploadUrl="upload/"
+				sendXHR="true"
+				tooltip="Sobre o arquivo para o servidor"
+				uploadComplete="onUploadCompleto"/>
+			<Button
+				text="Upload Arquivo" icon="sap-icon://upload"
+				press="onUploadFilePress"/>
+
+			<Panel expandable="true" width="auto" class="sapUiNoMargin" >
+				<headerToolbar>
+					<OverflowToolbar style="Clear">
+						<Title text="Mapeamento de Campos" />
+					</OverflowToolbar>
+				</headerToolbar>
+				<content>
+				<f:SimpleForm id="frmFieldMapping" layout="ColumnLayout" editable="true" 
+					labelSpanXL="2"
+					labelSpanL="2"
+					labelSpanM="2"
+					emptySpanXL="4"
+					emptySpanL="4"
+					emptySpanM="4"
+					columnsXL="2"
+					columnsL="2"
+					columnsM="2" >
+					<Label text="Nr Ref" /> <Input value="{field-map>/nr_referencia}"/>
+					<Label text="Descrição" /> <Input value="{field-map>/descricao}"/>
+					<Label text="Data" /> <Input value="{field-map>/data}"/>
+					<Label text="Valor" /> <Input value="{field-map>/valor}"/>
+				</f:SimpleForm>
+				</content>						
+			</Panel>
+			<Panel expandable="true" width="auto" class="sapUiNoMargin" >
+				<headerToolbar>
+					<OverflowToolbar style="Clear">
+						<Title text="Configurações" />
+					</OverflowToolbar>
+				</headerToolbar>
+				<content>
+				</content>						
+				<f:SimpleForm id="frmConfig" layout="ColumnLayout" editable="true" 
+					labelSpanXL="2"
+					labelSpanL="2"
+					labelSpanM="2"
+					emptySpanXL="4"
+					emptySpanL="4"
+					emptySpanM="4"
+					columnsXL="2"
+					columnsL="2"
+					columnsM="2" >
+					<Label text="Formato de data" /> <Input value="{conf-user>/FormatoData}" />
+					<Label text="Separador de Milhar" /> <Input value="{conf-user>/MilSeparator}" />
+					<Label text="Separador de Decimal" /> <Input value="{conf-user>/DecSeparator}" />
+				</f:SimpleForm>
+			</Panel>
+
+			<Table id="idTblImportarArquivo" items="{imp_arq>/}" mode="{conf>/TableImpArqMode}" delete="onTableImpArqDeletePress">
+				<headerToolbar>
+					<OverFlowToolbar>
+						<Title text="Arquivo importado Lançamentos" />
+						<ToolbarSpacer />
+						<Button icon="sap-icon://delete"
+							tooltip="Eliminar linhas" press="onBtnElimLinhasPress" enabled="{= ${imp_arq>/}.length !== 0 }" />
+						<Button icon="sap-icon://add" text="Importar linhas" 
+							tooltip="Importar linhas selecionadas" press="onBtnImportarLinhasPress" enabled="true" />
+					</OverFlowToolbar>
+				</headerToolbar>
+				<columns>
+					<Column><Text text="A" /></Column>
+					<Column><Text text="B" /></Column>
+					<Column><Text text="C" /></Column>
+					<Column><Text text="D" /></Column>
+					<Column><Text text="E" /></Column>
+					<Column><Text text="F" /></Column>
+					<Column><Text text="G" /></Column>
+				</columns>
+				<items>					
+					<ColumnListItem type="Active">
+						<cells>
+							<Text text="{imp_arq>A}" />
+							<Text text="{imp_arq>B}" />
+							<Text text="{imp_arq>C}" />
+							<Text text="{imp_arq>D}" />
+							<Text text="{imp_arq>E}" />
+							<Text text="{imp_arq>F}" />
+							<Text text="{imp_arq>G}" />
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+
+		</content>
+
+	</Page>
+</mvc:View>

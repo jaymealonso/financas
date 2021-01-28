@@ -1,0 +1,57 @@
+
+<mvc:View
+	controllerName="sap.ui.demo.basicTemplate.controller.Lancamentos"
+	displayBlock="true"
+	xmlns="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:core="sap.ui.core" >
+	<Page
+		id="page"
+		title="{conf>/PageTitle}" showNavButton="true" navButtonPress="onBackPress">
+		<content>
+			<Table items="{lancamentos>/}" itemPress="onLancItemPress" mode="{conf>/TableLancamentosMode}" delete="onTableLancDelete" 
+				fixedLayout="true" >
+				<headerToolbar>
+					<OverFlowToolbar>
+						<Title text="{conf>/TableLancamentosTitle}" />
+						<ToolbarSpacer />
+						<Button text="Categorias" tooltip="Manutenção de categorias" press="onCategoriasPress" enabled="{= ${conf>/ColumnType} === 'Active' }" />
+						<Button icon="sap-icon://upload" tooltip="Importar arquivo" press="onLancUpFilePress" enabled="{= ${conf>/ColumnType} === 'Active' }" />
+						<Button icon="sap-icon://refresh" tooltip="Atualizar" press="onLancAtualizPress" enabled="{= ${conf>/ColumnType} === 'Active' }" />
+						<Button icon="sap-icon://filter" tooltip="Filtrar" press="onLancFiltoPress" enabled="{= ${conf>/ColumnType} === 'Active' }" />
+						<Button icon="sap-icon://delete" tooltip="Eliminar" press="onEliminarTogglePress" enabled="{= ${conf>/ColumnType} === 'Active' }" />
+						<Button icon="sap-icon://add" tooltip="Novo Lançamento" press="onNewLancamento" enabled="{= ${conf>/ColumnType} === 'Active' }" />
+					</OverFlowToolbar>
+				</headerToolbar>
+				<columns>
+					<Column width="4em" visible="false">
+						<Text text="Conta Id" />
+					</Column>
+					<Column width="4em">
+						<Text text="Id" />
+					</Column>
+					<Column width="8em">
+						<Text text="Nr Ref" />
+					</Column>
+					<Column>
+						<Text text="Descrição" />
+					</Column>
+					<Column width="10em">
+						<Text text="Data" />
+					</Column>
+					<Column width="10em">
+						<Text text="Categoria" />
+					</Column>
+					<Column width="10em" hAlign="End">
+						<Text text="Valor" />
+					</Column>
+					<Column width="3.5em" />
+					<Column width="3.5em" />
+				</columns>
+				<items>
+					<core:Fragment fragmentName="sap.ui.demo.basicTemplate.view.Lancamento-display" type="XML" />
+				</items>
+			</Table>		
+		</content>
+	</Page>
+</mvc:View>

@@ -1,0 +1,73 @@
+{
+  "name": "financas",
+  "version": "1.0.0",
+  "description": "Controle de Finanças Pessoais",
+  "private": true,
+  "main": "electron/index.js",
+  "scripts": {
+    "start": "electron .",
+    "startD": "electron . --inspect",
+    "startPT": "electron . --lang=pt-br",
+    "startDPT": "electron . --lang=pt-br --inspect",
+    "ef-start": "electron-forge start",
+    "server": "node -e \"require('./electron/server.js').startServer( )\"",
+    "startUI5": "ui5 serve",
+    "electron": "electron .",
+    "lint": "eslint webapp",
+    "karma": "karma start",
+    "karma-ci": "karma start karma-ci.conf.js",
+    "watch": "npm run karma",
+    "test": "npm run lint && rimraf coverage && npm run karma-ci",
+    "build": "rimraf dist && ui5 build --a",
+    "postinstall": "electron-builder install-app-deps",
+    "package": "electron-forge package --lang=pt-br",
+    "make": "electron-forge make"
+  },
+  "keywords": [],
+  "author": "Jayme Alonso",
+  "license": "ISC",
+  "dependencies": {
+    "@openui5/sap.m": "^1.73.1",
+    "@openui5/sap.ui.core": "^1.73.1",
+    "@openui5/sap.ui.layout": "^1.73.1",
+    "@openui5/sap.ui.table": "^1.84.0",
+    "@openui5/themelib_sap_belize": "^1.73.1",
+    "better-sqlite3": "^7.1.1",
+    "body-parser": "^1.19.0",
+    "electron-routes": "^1.3.0",
+    "electron-squirrel-startup": "^1.0.0",
+    "express": "^4.17.1",
+    "express-fileupload": "^1.2.0",
+    "node-static": "^0.7.11",
+    "xlsx": "^0.16.9"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^6.0.0-beta.54",
+    "@electron-forge/maker-deb": "^6.0.0-beta.54",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.54",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.54",
+    "@electron-forge/maker-zip": "^6.0.0-beta.54",
+    "@ui5/cli": "^1.0.0",
+    "electron": "^7.3.3",
+    "electron-forge": "^5.2.4",
+    "eslint": "^4.19.1",
+    "karma": "^4.0.1",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-coverage": "^1.1.2",
+    "karma-ui5": "^1.0.0",
+    "rimraf": "^2.6.2"
+  },
+  "config": {
+    "forge": {
+      "packagerConfig": {},
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "financas"
+          }
+        }
+      ]
+    }
+  }
+}

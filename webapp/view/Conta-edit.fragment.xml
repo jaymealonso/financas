@@ -1,0 +1,24 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core" >
+
+<ColumnListItem>
+    <cells>
+        <Input value="{contas>_id}" />
+        <Input value="{contas>descricao}" />
+        <Input value="{contas>numero}" />
+        <Input value="{contas>moeda}" />
+        <Select
+            selectedKey="{contas>tipo}"
+            items="{contas_tipos>/}">
+            <core:Item key="{contas_tipos>_id}" text="{contas_tipos>descricao}" />
+        </Select>
+        <Text text="{contas>count_categ}" />
+        <Text text="{contas>count_n_categ}" />
+        <Text text="" />
+        <Button icon="sap-icon://accept" type="Accept" press="onContaEditAcceptPress" />
+        <Button icon="sap-icon://decline" type="Reject" press="onContaEditRejectPress" />
+    </cells>
+</ColumnListItem>
+
+</core:FragmentDefinition>

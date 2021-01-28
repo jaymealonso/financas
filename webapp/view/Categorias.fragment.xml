@@ -1,0 +1,22 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core" >
+
+    <Dialog title="Categorias" class="sapUiSizeCompact">
+        <endButton>
+            <Button text="Fechar" press="onCategoriasFecharPress" />
+        </endButton>
+        <content>
+            <HBox>
+                <Input />
+                <Button icon="sap-icon://add" press="onAddCategoriaPress" />
+            </HBox>
+            <List items="{categorias>/}" mode="Delete">
+                <items>
+                    <StandardListItem title="{categorias>nm_categoria}" />
+                </items>
+            </List>
+        </content>
+    </Dialog>
+
+</core:FragmentDefinition>

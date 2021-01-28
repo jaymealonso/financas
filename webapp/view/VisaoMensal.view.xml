@@ -1,0 +1,32 @@
+<mvc:View
+	controllerName="sap.ui.demo.basicTemplate.controller.VisaoMensal"
+	displayBlock="true"
+    xmlns="sap.ui.table"
+    xmlns:m="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core" >
+	<m:Page
+		showHeader="true"
+		class="sapUiContentPadding" title="Visão Mensal" showNavButton="true" navButtonPress="onBackPress">
+        <m:content>
+
+            <Table
+                rows="{visao_geral>/values/}"
+                visibleRowCountMode="Auto"
+                columns="{ path: 'visao_geral>/columns/', factory: '.onColFactory' }"
+                selectionMode="None" fixedColumnCount="1"
+                paste="onPaste"
+                ariaLabelledBy="title">
+                <extension>
+                    <m:OverflowToolbar>
+                        <m:Title text="Visão Mensal"/>
+                        <m:ToolbarSpacer />
+                        <m:Button icon="sap-icon://filter" tooltip="Filtrar" press="onLancFiltoPress" enabled="{= ${conf>/ColumnType} === 'Active' }" />
+                    </m:OverflowToolbar>
+                </extension>
+            </Table>
+        
+        </m:content>
+    </m:Page>        
+
+</mvc:View>

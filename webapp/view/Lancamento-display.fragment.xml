@@ -1,0 +1,42 @@
+<core:FragmentDefinition
+xmlns="sap.m"
+xmlns:core="sap.ui.core" >
+
+<ColumnListItem type="{conf>/ColumnType}">
+    <cells>
+        <Text text="{lancamentos>conta_id}" />
+        <Text text="{lancamentos>_id}" />
+        <Text text="{lancamentos>nr_referencia}" />
+        <Text text="{lancamentos>descricao}" />
+        <Text text="{
+                path: 'lancamentos>data',
+                type: 'sap.ui.model.type.Date',
+                formatOptions: {
+                    style: 'short'
+                }
+            }" />
+
+        <ComboBox
+            items="{path: 'categorias>/', templateShareable:true }" enabled="{= ${conf>/ColumnType} === 'Active' }"
+            selectedKey="{lancamentos>categoria_id}" selectionChange="onCmbCategSelChange">
+            <items>
+                <core:Item key="{categorias>_id}" text="{categorias>nm_categoria}" />
+            </items>
+        </ComboBox>        
+    
+        <ObjectNumber number="{ 
+                parts: [{path: 'lancamentos>valor'}, {path: 'lancamentos>moeda'}], 
+                type: 'sap.ui.model.type.Currency',
+                formatOptions: {
+                    minFractionDigits: 2,
+                    showMeasure: false
+                }								
+            }" 
+            state="{= ${lancamentos>valor} &lt; 0 ? 'Error' : 'Success' }"
+            unit="{lancamentos>moeda}" />
+        <Text />
+        <Text />
+    </cells>
+</ColumnListItem>
+
+</core:FragmentDefinition>
