@@ -19,7 +19,6 @@
     "watch": "npm run karma",
     "test": "npm run lint && rimraf coverage && npm run karma-ci",
     "build": "rimraf dist && ui5 build --a",
-    "buildX": "rimraf dist && ui5 build --a --exclude-task=\"escapeNonAsciiCharacters\"",
     "postinstall": "electron-builder install-app-deps",
     "package": "electron-forge package --lang=pt-br",
     "make": "electron-forge make"

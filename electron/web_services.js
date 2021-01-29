@@ -1,10 +1,11 @@
-const sqlite3 = require('better-sqlite3');
+/* eslint-disable strict */
+const Sqlite3 = require('better-sqlite3');
 const path = require('path');
-const databaseFile_fullPath = path.normalize(`${__dirname}/../db/financas.db`);
+const databaseFileFullPath = path.normalize(`${__dirname}/../db/financas.db`);
 let db;
 
-function connect () {
-    db = new sqlite3(databaseFile_fullPath, { verbose: console.log });
+const connect = () => {
+    db = new Sqlite3(databaseFileFullPath, { verbose: console.log });
         
     if (db) {
         console.log('Connected to the financas.db database (READ_WRITE).');
@@ -122,6 +123,7 @@ function getLancamentos(oObject, fnCallbackRender) {
 
         // oSQLParams["categoria_id"] = oObject.categoria_id;
         // oSQLParams["ano_mes"] = oObject.ano_mes + "%";
+        // eslint-disable-next-line camelcase
         oObject.ano_mes = `${oObject.ano_mes}%`;
     }
 
@@ -200,8 +202,11 @@ function getVisaoMensal(oValores, fnCallbackRender) {
         var oValues = aValues.find(i => i.nm_categoria === element.nm_categoria);
         if (!oValues) {
             oValues = { 
+                // eslint-disable-next-line camelcase
                 conta_id : element.conta_id,
+                // eslint-disable-next-line camelcase
                 categoria_id: element.categoria_id,
+                // eslint-disable-next-line camelcase
                 nm_categoria : element.nm_categoria,
                 moeda: element.moeda
             };  
@@ -230,6 +235,7 @@ function getVisaoMensal(oValores, fnCallbackRender) {
     let rows2 = stmt2.all(oValores.conta_id);
 
     // Adiciona uma coluna de descrição no inicio da lista de colunas 
+    // eslint-disable-next-line camelcase
     rows2 = [{conta_id: oValores.conta_id, ano_mes: null }].concat(rows2);
 
     rows2.forEach(function (i) {
@@ -241,7 +247,7 @@ function getVisaoMensal(oValores, fnCallbackRender) {
         }
     });
 
-    var sDateTimeStamp = new Date().toISOString();
+    sDateTimeStamp = new Date().toISOString();
     console.log(`${sDateTimeStamp} Visao Mensal ${rows2.length} colunas - Conta> _id: ${oValores.conta_id}`);
 
     let oResponse = {
@@ -266,7 +272,9 @@ function newLancamento (oValores, fnCallbackRender) {
     let insert = db.prepare(sql);
     let info = insert.run({
         id: null, 
+        // eslint-disable-next-line camelcase
         conta_id: oValores.conta_id,  
+        // eslint-disable-next-line camelcase
         nr_referencia: oValores.nr_referencia, 
         descricao: oValores.descricao, 
         data: oValores.data, 
@@ -288,6 +296,7 @@ function newCategoria(oValores ,fnCallbackRender) {
     let insert = db.prepare(sql);
     let info = insert.run({
         id: null, 
+        // eslint-disable-next-line camelcase
         nm_categoria: oValores.nm_categoria
     });
     if (info) {
@@ -304,7 +313,9 @@ function newLancamentoCategoria (sLancId, sCategId, fnCallbackRender) {
 
     let insert = db.prepare(sql);
     let info = insert.run({
+        // eslint-disable-next-line camelcase
         lancamento_id: sLancId, 
+        // eslint-disable-next-line camelcase
         categoria_id: sCategId
     });
     if (info) {
@@ -356,7 +367,9 @@ function changeLancamento(oValores, fnCallbackRender) {
     let update = db.prepare(sql);
     let info = update.run({
         id: oValores._id, 
+        // eslint-disable-next-line camelcase
         conta_id: oValores.conta_id,  
+        // eslint-disable-next-line camelcase
         nr_referencia: oValores.nr_referencia, 
         descricao: oValores.descricao, 
         data: oValores.data, 
@@ -382,6 +395,7 @@ function deleteLancamentoCategoria (sLancId, fnCallbackRender) {
 
     let cDelete = db.prepare(sql);
     let info = cDelete.run({
+        // eslint-disable-next-line camelcase
         lancamento_id: sLancId
     });
 
@@ -400,6 +414,7 @@ function deleteLancamento (sConta, sLancId, fnCallbackRender) {
     let cDelete = db.prepare(sql);
     let info = cDelete.run({
         id: sLancId, 
+        // eslint-disable-next-line camelcase
         conta_id: sConta 
     });
 
@@ -469,20 +484,20 @@ function parseFileExcel(oFile)  {
 
 }
 
-function parseFileCSV(sFileString) {
-    var oOutObj = {};
-    var aLines = sFileString.split("\r\n");
+// function parseFileCSV(sFileString) {
+//     var oOutObj = {};
+//     var aLines = sFileString.split("\r\n");
     
-    for (var iIndLine in aLines) { 
-        var aValues =  aLines[iIndLine].split(";");
-        var oParsedLine = {}
-        for (var iIndValue in aValues) {
-            oParsedLine[iIndValue] = aValues[iIndValue];
-        }
-        oOutObj[iIndLine] = oParsedLine;
-    }
-    return oOutObj;
-}
+//     for (var iIndLine in aLines) { 
+//         var aValues =  aLines[iIndLine].split(";");
+//         var oParsedLine = {}
+//         for (var iIndValue in aValues) {
+//             oParsedLine[iIndValue] = aValues[iIndValue];
+//         }
+//         oOutObj[iIndLine] = oParsedLine;
+//     }
+//     return oOutObj;
+// }
 
 module.exports = {
     connect: connect,

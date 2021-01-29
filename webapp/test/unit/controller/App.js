@@ -8,6 +8,7 @@ sap.ui.define([
 	QUnit.module("App Controller");
 
 	QUnit.test("I should test the controller", function (assert) {
+		// eslint-disable-next-line new-cap
 		var oAppController = new oController();
 
 		oAppController.onInit();
