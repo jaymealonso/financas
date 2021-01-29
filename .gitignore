@@ -1,7 +1,9 @@
+
 node_modules
 dist
 coverage
 dist
+db/financas.db
 
 out/
-db/financas.db
+.env
