@@ -18,7 +18,7 @@ const createDataBaseFromFile = () => {
             if (err) {
                 return console.error(err.message);
             }
-            console.log('Connected to the financas.db database (READ_WRITE/CREATE).');
+            return console.log('Connected to the financas.db database (READ_WRITE/CREATE).');
         });
         fs.readFile(creationScriptFullPath, 'utf8', (err, contents) => {
             console.log("Finalizou a leitura do arquivo");
@@ -34,8 +34,9 @@ const createDataBaseFromFile = () => {
                     console.log('Erro ao criar Tabelas DB!');
                     return console.error(err.message);
                 }
-                console.log('Dados iniciais de DB criados!');
+                return console.log('Dados iniciais de DB criados!');
             });
+            return "";
         });
 
         console.log('Can read/write');
