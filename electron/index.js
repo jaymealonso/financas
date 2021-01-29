@@ -1,29 +1,32 @@
+/* eslint-disable strict */
+const result = require('dotenv').config();
+console.log(`
+  env vars ${JSON.stringify(result)}
+  process ${process.env.DB_LOG_ACTIVE}
+`);
+
 const { join } = require('path');
-//const ROOT_URL = `http://localhost:9990/index.html`
-
-// const ROOT_URL = join(__dirname, '..', 'webapp', 'index.html');
-const ROOT_URL = join(__dirname, '..', 'dist', 'index.html');
-
 const { ipcMain, app, BrowserWindow } = require('electron');
+
+const ROOT_URL = join(__dirname, '..', 'webapp', 'index.html');
+//const ROOT_URL = join(__dirname, '..', 'dist', 'index.html');
 
 /* prevent App launching after install */
 if (require('electron-squirrel-startup')) app.quit();
 
+/* Create DB Structure - se não existir já */
 const db = require(join(__dirname, '..', 'db', 'create_db.js'));
-
-/* Create DB Structure */
 db.createDataBaseFromFile();
 
 let mainWindow;
 
-// linha abaixo nao funciona, mas talvez no futuro
-app.commandLine.appendSwitch('lang', 'pt-br');
+/*
+  // linha abaixo nao funciona, mas talvez no futuro
+  app.commandLine.appendSwitch('lang', 'pt-br');
+*/
 
 const createWindow = () => { 
-  'use strict'
-
   try {
-
     console.log("> Locale: " + app.getLocale());
 
     // Create the browser window.
@@ -101,7 +104,6 @@ app.on('ready', createWindow);
 app.on('window-all-closed', () => {
   // On OS X it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
-  'use strict'
   if (process.platform !== 'darwin') {
     app.quit();
   }
@@ -110,7 +112,6 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  'use strict'
   if (mainWindow === null) {
     createWindow();
   }
@@ -121,7 +122,6 @@ app.on('activate', () => {
 //const ipc = app.ipcMain;
 
 ipcMain.on("go-back-button", () => {
-  'use strict'
   mainWindow.webContents.goBack(); 
 });
 

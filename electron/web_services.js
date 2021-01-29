@@ -1,22 +1,32 @@
 /* eslint-disable strict */
 const Sqlite3 = require('better-sqlite3');
-const path = require('path');
-const databaseFileFullPath = path.normalize(`${__dirname}/../db/financas.db`);
+const Path = require('path');
+const databaseFileFullPath = Path.normalize(`${__dirname}/../db/financas.db`);
+
+console.log(`
+  2 process ${process.env.DB_LOG_ACTIVE}
+`);
+
+const log = (text, ...vars) => {
+    if (process.env.DB_LOG_ACTIVE) {
+        console.log(text, ...vars);
+    }
+}
 
 const connect = () => {
-    var db = new Sqlite3(databaseFileFullPath, { verbose: console.log });
+    var db = new Sqlite3(databaseFileFullPath, { verbose: log });
         
     if (db) {
-        console.log('Connected to the financas.db database (READ_WRITE).');
+        log('Connected to the financas.db database (READ_WRITE).');
     } else {
-        console.log('Erro ao conectar na DB.');
+        log('Erro ao conectar na DB.');
     }
     return db;
 }
 
 const db = connect();
 
-function readConta(sContaId, fnCallbackRender) {
+const readConta = (sContaId, fnCallbackRender) => {
     let sql = `
 select c._id, c.descricao, c.numero, c.moeda, c.tipo, ct.descricao as tipo_descricao,
     ( select count(*) 
@@ -37,7 +47,7 @@ where c._id = ?
     let row = stmt.get(sContaId);
     
     var sDateTimeStamp = new Date().toISOString();
-    console.log(`${sDateTimeStamp} Read SINGLE Conta> : ${row}`);
+    log(`${sDateTimeStamp} Read SINGLE Conta> : ${row}`);
 
     fnCallbackRender(row);
 }
@@ -57,7 +67,7 @@ function readLancamento(sLancId, fnCallbackRender) {
     let row = stmt.get(sLancId);
     
     var sDateTimeStamp = new Date().toISOString();
-    console.log(`${sDateTimeStamp} Read SINGLE Lancamento> : ${row}`);
+    log(`${sDateTimeStamp} Read SINGLE Lancamento> : ${row}`);
 
     fnCallbackRender(row);
 }
@@ -86,7 +96,7 @@ from contas as c
     rows.forEach((row) => {
         aId.push(row._id);
     });
-    console.log(`${sDateTimeStamp} Read ${aId.length} Contas> _id: ${aId.join(",")}`);
+    log(`${sDateTimeStamp} Read ${aId.length} Contas> _id: ${aId.join(",")}`);
 
     fnCallbackRender(rows);
 }
@@ -104,15 +114,12 @@ function getContasTipos (fnCallbackRender) {
     rows.forEach((row) => {
         aId.push(row._id);
     });
-    console.log(`${sDateTimeStamp} Read ${aId.length} Contas_tipo> _id: ${aId.join(",")}`);
+    log(`${sDateTimeStamp} Read ${aId.length} Contas_tipo> _id: ${aId.join(",")}`);
 
     fnCallbackRender(rows);
 }
 
 function getLancamentos(oObject, fnCallbackRender) {
-    // var oSQLParams = {
-    //     conta_id: sConta
-    // }
     var sAditionalQuery = "";
     
     if (oObject.ano_mes) {
@@ -122,9 +129,6 @@ function getLancamentos(oObject, fnCallbackRender) {
         } else {
             sAditionalQuery = `${sAditionalQuery} AND c._id is null`
         }
-
-        // oSQLParams["categoria_id"] = oObject.categoria_id;
-        // oSQLParams["ano_mes"] = oObject.ano_mes + "%";
         // eslint-disable-next-line camelcase
         oObject.ano_mes = `${oObject.ano_mes}%`;
     }
@@ -151,7 +155,7 @@ function getLancamentos(oObject, fnCallbackRender) {
         aId.push(row._id);
         row.data = new Date(row.data);
     });
-    console.log(`${sDateTimeStamp} Read ${aId.length} Lancamentos> _id: ${aId.join(",")}`);
+    log(`${sDateTimeStamp} Read ${aId.length} Lancamentos> _id: ${aId.join(",")}`);
 
     fnCallbackRender(rows);
 }
@@ -169,7 +173,7 @@ function getCategorias (fnCallbackRender) {
     rows.forEach((row) => {
         aId.push(row._id);
     });
-    console.log(`${sDateTimeStamp} Read ${aId.length} Categorias> _id: ${aId.join(",")}`);
+    log(`${sDateTimeStamp} Read ${aId.length} Categorias> _id: ${aId.join(",")}`);
 
     fnCallbackRender(rows);
 
@@ -219,7 +223,7 @@ function getVisaoMensal(oValores, fnCallbackRender) {
     rows = aValues;
 
     var sDateTimeStamp = new Date().toISOString();
-    console.log(`${sDateTimeStamp} Visao Mensal ${rows.length} linhas - Conta> _id: ${oValores.conta_id}`);
+    log(`${sDateTimeStamp} Visao Mensal ${rows.length} linhas - Conta> _id: ${oValores.conta_id}`);
 
     let sql2 = 
         `
@@ -250,7 +254,7 @@ function getVisaoMensal(oValores, fnCallbackRender) {
     });
 
     sDateTimeStamp = new Date().toISOString();
-    console.log(`${sDateTimeStamp} Visao Mensal ${rows2.length} colunas - Conta> _id: ${oValores.conta_id}`);
+    log(`${sDateTimeStamp} Visao Mensal ${rows2.length} colunas - Conta> _id: ${oValores.conta_id}`);
 
     let oResponse = {
         columns: rows2,
@@ -284,7 +288,7 @@ function newLancamento (oValores, fnCallbackRender) {
     });
     if (info) {
         var sDateTimeStamp = new Date().toISOString();
-        console.log( `${sDateTimeStamp} > INSERT Lançamento ID: ${this.lastInsertRowid}` );
+        log( `${sDateTimeStamp} > INSERT Lançamento ID: ${this.lastInsertRowid}` );
         oValues._id = info.lastInsertRowid;
     }
 
@@ -303,7 +307,7 @@ function newCategoria(oValores ,fnCallbackRender) {
     });
     if (info) {
         var sDateTimeStamp = new Date().toISOString();
-        console.log( `${sDateTimeStamp} > INSERT Categoria: ${oValores.nm_categoria}` );
+        log( `${sDateTimeStamp} > INSERT Categoria: ${oValores.nm_categoria}` );
     }
   
     fnCallbackRender(info);
@@ -322,7 +326,7 @@ function newLancamentoCategoria (sLancId, sCategId, fnCallbackRender) {
     });
     if (info) {
         var sDateTimeStamp = new Date().toISOString();
-        console.log( `${sDateTimeStamp} > INSERT Lancamento ${sLancId} Categoria: ${sCategId}` );
+        log( `${sDateTimeStamp} > INSERT Lancamento ${sLancId} Categoria: ${sCategId}` );
     }
   
     fnCallbackRender(info);
@@ -348,7 +352,7 @@ function changeConta(oValores, fnCallbackRender) {
     });
     if (info) {
         var sDateTimeStamp = new Date().toISOString();
-        console.log( `${sDateTimeStamp} > CHANGE CONTA ID: ${oValores._id}` );
+        log( `${sDateTimeStamp} > CHANGE CONTA ID: ${oValores._id}` );
     }
 
     readConta(oValores._id, fnCallbackRender);
@@ -379,7 +383,7 @@ function changeLancamento(oValores, fnCallbackRender) {
     });
     if (info) {
         var sDateTimeStamp = new Date().toISOString();
-        console.log( `${sDateTimeStamp} > CHANGE Conta ID: ${oValores.conta_id} Lanc: ${oValores._id}` );
+        log( `${sDateTimeStamp} > CHANGE Conta ID: ${oValores.conta_id} Lanc: ${oValores._id}` );
     }
 
     deleteLancamentoCategoria(oValores._id, ()=>{} );
@@ -403,7 +407,7 @@ function deleteLancamentoCategoria (sLancId, fnCallbackRender) {
 
     if (info) {
         var sDateTimeStamp = new Date().toISOString();
-        console.log(`${sDateTimeStamp} > DELETE Lancamento-Categoria: LancId: ${sLancId} `);
+        log(`${sDateTimeStamp} > DELETE Lancamento-Categoria: LancId: ${sLancId} `);
     }
 
     fnCallbackRender(info);
@@ -422,7 +426,7 @@ function deleteLancamento (sConta, sLancId, fnCallbackRender) {
 
     if (info) {
         var sDateTimeStamp = new Date().toISOString();
-        console.log(sDateTimeStamp + " > DELETE Conta ID:" + sConta + " Lanc: " + sLancId );
+        log(sDateTimeStamp + " > DELETE Conta ID:" + sConta + " Lanc: " + sLancId );
     }
 
     fnCallbackRender(info);
@@ -476,7 +480,7 @@ function parseFileExcel(oFile)  {
         }
     }
 
-    console.log(`Processado arquivo com ${oOutObj.length} linhas.`);
+    log(`Processado arquivo com ${oOutObj.length} linhas.`);
 
     var aOut = [];
     for (var i in oOutObj) {
