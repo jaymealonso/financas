@@ -4,3 +4,4 @@ coverage
 dist
 
 out/
+db/financas.db
