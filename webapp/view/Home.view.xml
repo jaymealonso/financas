@@ -11,41 +11,41 @@
 			<Table items="{contas>/}">
 				<headerToolbar>
 					<OverFlowToolbar>
-						<Title text="Contas" />
+						<Title text="{i18n>home-title-contas}" />
 						<ToolbarSpacer />
-						<Button icon="sap-icon://create" tooltip="Nova conta" press="onNewConta" />
+						<Button icon="sap-icon://create" text="{i18n>home-btn-novaconta}" press="onNewConta" />
 					</OverFlowToolbar>
 				</headerToolbar>
 				<columns>
 					<Column width="4em">
-						<Text text="Id" />
+						<Text text="{i18n>home-cts-col-id}" />
 					</Column>
 					<Column>
-						<Text text="Descrição" />
+						<Text text="{i18n>home-cts-col-descricao}" />
 					</Column>
 					<Column>
-						<Text text="Numero" />
+						<Text text="{i18n>home-cts-col-numero}" />
 					</Column>
 					<Column hAlign="Center">
-						<Text text="Moeda" />
+						<Text text="{i18n>home-cts-col-moeda}" />
 					</Column>
 					<Column hAlign="Center">
-						<Text text="Tipo" />
+						<Text text="{i18n>home-cts-col-tipo}" />
 					</Column>
 					<Column hAlign="Center" >
-						<Text text="Lnç. Categ." tooltip="Lançamento já Categorizados" />
+						<Text text="{i18n>home-cts-col-lancctg}" tooltip="{i18n>home-cts-col-lancctg-tt}" />
 					</Column>
 					<Column hAlign="Center">
-						<Text text="Lnç. não Categ." tooltip="Lançamento ainda não Categorizados" />
+						<Text text="{i18n>home-cts-col-lancnctg}" tooltip="{i18n>home-cts-col-lancnctg-tt}" />
 					</Column>
 					<Column width="3.5em">
-						<Text tooltip="" />
+						<Text tooltip="{i18n>home-cts-col-visaomensal}" />
 					</Column>
 					<Column width="3.5em">
-						<Text tooltip="Editar" />
+						<Text tooltip="{i18n>home-cts-col-editar}" />
 					</Column>
 					<Column width="3.5em">
-						<Text tooltip="Lançamentos" />
+						<Text tooltip="{i18n>home-cts-col-lancamentos}" />
 					</Column>
 				</columns>
 				<items>

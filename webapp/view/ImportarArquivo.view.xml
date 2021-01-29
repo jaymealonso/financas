@@ -8,13 +8,13 @@
 	<Page id="page" 
 		title="{i18n>title-imp_arq}">
 		<content>
-			<u:FileUploader
+			<!-- <u:FileUploader
 				id="fileUploader"
 				name="myFileUpload"
 				uploadUrl="upload/"
 				sendXHR="true"
 				tooltip="Sobre o arquivo para o servidor"
-				uploadComplete="onUploadCompleto"/>
+				uploadComplete="onUploadCompleto"/> -->
 			<Button
 				text="Upload Arquivo" icon="sap-icon://upload"
 				press="onUploadFilePress"/>

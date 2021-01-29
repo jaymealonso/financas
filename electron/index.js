@@ -10,26 +10,17 @@ const { ipcMain, app, BrowserWindow } = require('electron');
 if (require('electron-squirrel-startup')) app.quit();
 
 const db = require(join(__dirname, '..', 'db', 'create_db.js'));
-// const server = require(join(__dirname, 'server.js'));
 
 /* Create DB Structure */
 db.createDataBaseFromFile();
-
-/* Start Server to respond to requests */
-//server.startServer();
-
-// const service = require(`./web_services.js`);
-// service.setDB(db);
 
 let mainWindow;
 
 // linha abaixo nao funciona, mas talvez no futuro
 app.commandLine.appendSwitch('lang', 'pt-br');
 
-const createWindow = () => {
-  
+const createWindow = () => { 
   'use strict'
-  // require('./internal-webserver.js').interceptStreamProt("../webapp");
 
   try {
 

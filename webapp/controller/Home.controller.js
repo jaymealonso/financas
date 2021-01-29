@@ -17,6 +17,7 @@ sap.ui.define([
 			const { join } = nodeRequire("path");
 			const { remote } = nodeRequire("electron");
 			this.webs = remote.require(join(__dirname, "..", "electron", "web_services.js"));
+			this.webs.connect();
 
 		},
 

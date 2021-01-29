@@ -2,17 +2,19 @@
 const Sqlite3 = require('better-sqlite3');
 const path = require('path');
 const databaseFileFullPath = path.normalize(`${__dirname}/../db/financas.db`);
-let db;
 
 const connect = () => {
-    db = new Sqlite3(databaseFileFullPath, { verbose: console.log });
+    var db = new Sqlite3(databaseFileFullPath, { verbose: console.log });
         
     if (db) {
         console.log('Connected to the financas.db database (READ_WRITE).');
     } else {
         console.log('Erro ao conectar na DB.');
     }
+    return db;
 }
+
+const db = connect();
 
 function readConta(sContaId, fnCallbackRender) {
     let sql = `
