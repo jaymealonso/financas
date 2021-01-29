@@ -10,6 +10,10 @@ sap.ui.define([
 
         onInit: function () {
 			this.getRouter().getTarget("visao_mensal").attachDisplay(jQuery.proxy(this.handleRouteMatched, this));
+
+			const { join } = nodeRequire("path");
+			const { remote } = nodeRequire("electron");
+			this.webs = remote.require(join(__dirname, "..", "electron", "web_services.js"));
 		},
 		
 		sContaId: null, 
@@ -25,11 +29,17 @@ sap.ui.define([
         _loadData: function (oEvt) {
 			var oView = this.getView();
 			oView.setModel(new JSONModel([{}]), "visao_geral");
-			$.ajax("/conta/" + this.sContaId + "/visao_mensal", {
-				success: function (values) {
-					oView.setModel(new JSONModel(values), "visao_geral");
-				}
+
+			// eslint-disable-next-line camelcase
+			this.webs.getVisaoMensal({conta_id: this.sContaId}, (values) => {
+				oView.setModel(new JSONModel(values), "visao_geral");
 			});
+
+			// $.ajax("/conta/" + this.sContaId + "/visao_mensal", {
+			// 	success: function (values) {
+			// 		oView.setModel(new JSONModel(values), "visao_geral");
+			// 	}
+			// });
         },
 
         onBackPress: function () {
@@ -114,17 +124,19 @@ sap.ui.define([
 			var sCategID = oModel.getProperty(sPath);
 			var sAnoMes = oNumber.getBindingInfo("number").parts[0].path;
 
-			var sValues = `ano_mes=${sAnoMes}`
+			// var sValues = `ano_mes=${sAnoMes}`
 			if (sCategID) {
 				sValues = `${sValues}&categoria_id=${sCategID}`;
 			}
 
-			var sURL = `/conta/${this.sContaId}/lancamentos?${sValues}`;
+			// var sURL = `/conta/${this.sContaId}/lancamentos?${sValues}`;
 
 			var that = this;
 
-			$.ajax(sURL, {
-				success: function (values) {
+			this.webs.getLancamentos(
+				// eslint-disable-next-line camelcase
+				{ conta_id: this.sContaId, ano_mes: sAnoMes, categoria_id: sCategID }, 
+				(values) => {
 					var oView = that.getView();
 					oView.setModel(new JSONModel(values), "vg_lanc_pop");
 					Fragment.load({
@@ -133,10 +145,23 @@ sap.ui.define([
 					}).then(function (oDialog) {
 						oView.addDependent(oDialog);
 						oDialog.open();
-					})
-
-				}
+				});
 			});
+
+			// $.ajax(sURL, {
+			// 	success: function (values) {
+			// 		var oView = that.getView();
+			// 		oView.setModel(new JSONModel(values), "vg_lanc_pop");
+			// 		Fragment.load({
+			// 			name: "sap.ui.demo.basicTemplate.view.VisaoMensal-LancPop",
+			// 			controller: that
+			// 		}).then(function (oDialog) {
+			// 			oView.addDependent(oDialog);
+			// 			oDialog.open();
+			// 		})
+
+			// 	}
+			// });
 		},
 		onLancPopFecharPress: function (oEvt) {
 			oEvt.getSource().getParent().close();

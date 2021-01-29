@@ -106,22 +106,23 @@ function getContasTipos (fnCallbackRender) {
     fnCallbackRender(rows);
 }
 
-function getLancamentos(sConta, oQuery, fnCallbackRender) {
-    var oSQLParams = {
-        conta_id: sConta
-    }
+function getLancamentos(oObject, fnCallbackRender) {
+    // var oSQLParams = {
+    //     conta_id: sConta
+    // }
     var sAditionalQuery = "";
     
-    if (oQuery.ano_mes) {
+    if (oObject.ano_mes) {
         sAditionalQuery = `AND l.data like @ano_mes`;
-        if (oQuery.categoria_id) {
+        if (oObject.categoria_id) {
             sAditionalQuery = `${sAditionalQuery} AND c._id = @categoria_id`
         } else {
             sAditionalQuery = `${sAditionalQuery} AND c._id is null`
         }
 
-        oSQLParams["categoria_id"] = oQuery.categoria_id;
-        oSQLParams["ano_mes"] = oQuery.ano_mes + "%";
+        // oSQLParams["categoria_id"] = oObject.categoria_id;
+        // oSQLParams["ano_mes"] = oObject.ano_mes + "%";
+        oObject.ano_mes = `${oObject.ano_mes}%`;
     }
 
     let sql = `
@@ -138,7 +139,7 @@ function getLancamentos(sConta, oQuery, fnCallbackRender) {
         `;
 
     let stmt = db.prepare(sql);
-    let rows = stmt.all(oSQLParams);
+    let rows = stmt.all(oObject);
     
     var sDateTimeStamp = new Date().toISOString();
     let aId = [];
@@ -252,7 +253,7 @@ function getVisaoMensal(oValores, fnCallbackRender) {
 
 }
 
-function newConta () {
+const newConta = () => {
 
 }
 
@@ -419,10 +420,21 @@ function parseFile(oFile, fnCallbackRender) {
     fnCallbackRender(oOutObj);
 }
 
-function parseFileExcel(oFile) {
+const openAndParseFile = async (fnCallbackRender) => {
+    const { dialog } = require('electron')
+    const fs = require('fs');
+    const files = await dialog.showOpenDialog({ properties: ['openFile'] });
+    if (files.filePaths[0]) {
+        parseFile(
+            fs.readFileSync(files.filePaths[0]), 
+            fnCallbackRender);
+    }
+}
+
+function parseFileExcel(oFile)  {
     const XLSX = require("XLSX");
 
-    var wb = XLSX.read(oFile.data.buffer, {type: "buffer"});
+    var wb = XLSX.read(oFile, {type: "buffer"});
 
     var sh = wb.Sheets[wb.SheetNames[0]];
 
@@ -487,5 +499,6 @@ module.exports = {
     changeLancamento: changeLancamento,
     deleteLancamento: deleteLancamento,
     readConta: readConta,
+    openAndParseFile: openAndParseFile,
     parseFile: parseFile
 }

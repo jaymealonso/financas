@@ -1,15 +1,16 @@
 const { join } = require('path');
-const ROOT_URL = `http://localhost:9990/index.html`
+//const ROOT_URL = `http://localhost:9990/index.html`
 
-//const ROOT_URL = join(__dirname, '..', 'dist', 'index.html');
+// const ROOT_URL = join(__dirname, '..', 'webapp', 'index.html');
+const ROOT_URL = join(__dirname, '..', 'dist', 'index.html');
 
-const { ipcMain, app, BrowserWindow, Menu, session } = require('electron');
+const { ipcMain, app, BrowserWindow } = require('electron');
 
 /* prevent App launching after install */
-if (require('electron-squirrel-startup')) return app.quit();
+if (require('electron-squirrel-startup')) app.quit();
 
 const db = require(join(__dirname, '..', 'db', 'create_db.js'));
-const server = require(join(__dirname, 'server.js'));
+// const server = require(join(__dirname, 'server.js'));
 
 /* Create DB Structure */
 db.createDataBaseFromFile();
@@ -27,7 +28,8 @@ app.commandLine.appendSwitch('lang', 'pt-br');
 
 const createWindow = () => {
   
-  require('./internal-webserver.js').interceptStreamProt("../webapp");
+  'use strict'
+  // require('./internal-webserver.js').interceptStreamProt("../webapp");
 
   try {
 
@@ -70,7 +72,7 @@ const createWindow = () => {
 
   //  const mainMenu = Menu.buildFromTemplate(mainMenuTemplate);
   //  Menu.setApplicationMenu(mainMenu);
-  }catch{
+  } catch (err) {
     app.quit();  
   }
 };
@@ -80,34 +82,35 @@ const createWindow = () => {
 // Some APIs can only be used after this event occurs.
 app.on('ready', createWindow);
 
-const mainMenuTemplate = [
-  { label: 'File', 
-    submenu: [ 
-      {
-        label: '&Add Item',
-        accelerator: 'Alt+a',
-        click() {
-          console.log("Abrir DEVTOOLS");
-          mainWindow.webContents.openDevTools(); }
-      },
-      {
-        label: '-'
-      },
-      {
-        label: 'Sair',
-        click() {
-          app.quit();
-        }
-      },
-  ] 
-  },
-  { label: 'DevTools' }  
-]
+// const mainMenuTemplate = [
+//   { label: 'File', 
+//     submenu: [ 
+//       {
+//         label: '&Add Item',
+//         accelerator: 'Alt+a',
+//         click() {
+//           console.log("Abrir DEVTOOLS");
+//           mainWindow.webContents.openDevTools(); }
+//       },
+//       {
+//         label: '-'
+//       },
+//       {
+//         label: 'Sair',
+//         click() {
+//           app.quit();
+//         }
+//       },
+//   ] 
+//   },
+//   { label: 'DevTools' }  
+// ]
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
   // On OS X it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
+  'use strict'
   if (process.platform !== 'darwin') {
     app.quit();
   }
@@ -116,6 +119,7 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
+  'use strict'
   if (mainWindow === null) {
     createWindow();
   }
@@ -126,6 +130,7 @@ app.on('activate', () => {
 //const ipc = app.ipcMain;
 
 ipcMain.on("go-back-button", () => {
+  'use strict'
   mainWindow.webContents.goBack(); 
 });
 

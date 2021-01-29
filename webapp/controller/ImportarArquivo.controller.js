@@ -14,6 +14,10 @@ sap.ui.define([
 
 			this.getRouter().getTarget("importar_arquivo").attachDisplay(jQuery.proxy(this.handleRouteMatched, this));
 
+			const { join } = nodeRequire("path");
+			const { remote } = nodeRequire("electron");
+			this.webs = remote.require(join(__dirname, "..", "electron", "web_services.js"));
+
 		},
 
 		sContaId: null,
@@ -51,14 +55,19 @@ sap.ui.define([
 		},
 
 		onUploadFilePress: function (oEvt) {
-			var oFileUploader = this.byId("fileUploader");
-			oFileUploader.checkFileReadable().then(function() {
-				oFileUploader.upload();
-			}, function(error) {
-				MessageToast.show("Não foi possivel ler o arquivo. Ele pode ter sido modificado.");
-			}).then(function() {
-				oFileUploader.clear();
+			this.webs.openAndParseFile((oParsedJson) => {
+				this.getView().getModel("imp_arq").setProperty("/", oParsedJson);	
 			});
+
+			// var that = this;
+			// var oFileUploader = this.byId("fileUploader");
+			// oFileUploader.checkFileReadable().then(function() {
+			// 	oFileUploader.upload();
+			// }, function(error) {
+			// 	MessageToast.show("Não foi possivel ler o arquivo. Ele pode ter sido modificado.");
+			// }).then(function() {
+			// 	oFileUploader.clear();
+			// });
 		},
 		onUploadCompleto: function (oEvt) {
 			var oParsedJson = JSON.parse(oEvt.getParameter("responseRaw"));
@@ -90,7 +99,7 @@ sap.ui.define([
 				return; 
 			}
 
-			var oValuesModel = this.getView().getModel("imp_arq");
+			// var oValuesModel = this.getView().getModel("imp_arq");
 			var oMapModel = this.getView().getModel("field-map");
 			var oMap = oMapModel.getProperty("/");
 
@@ -103,19 +112,36 @@ sap.ui.define([
 				var sData = this._formatDate( oValues[oMap.data] );
 
 				var that = this;
-				var sURL = "/conta/" + this.sContaId + "/lancamentos";
-				$.post(sURL, 
+				// var sURL = "/conta/" + this.sContaId + "/lancamentos";
+
+				this.webs.newLancamento(
 					{
+						// eslint-disable-next-line camelcase
 						conta_id: that.sContaId,
+						// eslint-disable-next-line camelcase
 						nr_referencia: sRef,
 						descricao: sDescr,
 						data: sData,
 						valor: sValor
 					},
-					function (response) {
-						MessageToast.show("Inserido item X.");
-					}
+					(response) => 
+						MessageToast.show(
+							`Lancamento adicionado de ${response.data} valor ${response.valor}`
+					) 
 				);
+
+				// $.post(sURL, 
+				// 	{
+				// 		conta_id: that.sContaId,
+				// 		nr_referencia: sRef,
+				// 		descricao: sDescr,
+				// 		data: sData,
+				// 		valor: sValor
+				// 	},
+				// 	function (response) {
+				// 		MessageToast.show("Inserido item X.");
+				// 	}
+				// );
 			}
 		},
 

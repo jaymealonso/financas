@@ -32,15 +32,34 @@ const returnJSON = (url, fnCallback, fnGetData) => {
 }
 
 const routes = [
-    { method: "GET", name: "resources", fnExec: returnResources, fnGetData: null },
-    { method: "GET", name: "contas", fnExec: returnJSON, fnGetData: web_services.getContas },
-    { method: "GET", name: "contas_tipos", fnExec: returnJSON, fnGetData: web_services.getContasTipos },
-    { method: "GET", name: "categorias", fnExec: returnJSON, fnGetData: web_services.getCategorias },
-    { method: "POST", name: "categorias", fnExec: returnJSON, fnGetData: web_services.getCategorias }    
+    { method: "GET", name: "/resources", fnExec: returnResources, fnGetData: null },
+    { method: "GET", name: "/contas", fnExec: returnJSON, fnGetData: web_services.getContas },
+    { method: "GET", name: "/contas_tipos", fnExec: returnJSON, fnGetData: web_services.getContasTipos },
+    { method: "GET", name: "/categorias", fnExec: returnJSON, fnGetData: web_services.getCategorias },
+    { method: "POST", name: "/categorias", fnExec: returnJSON, fnGetData: web_services.getCategorias }
 ];
 
+const findExpressRegex = (pattern, url) => {
+    let sRegex = "/^";
+    const parts = pattern.split("/");
+    parts.forEach(element => {
+        if (element !== "") {
+            if (element.substr(1) === ":") {  
+                sRegex = sRegex.concat("\\/((?:[^\/]+?))");
+            } else {
+                sRegex = sRegex.concat(`\\/${element}`);
+            }
+        }
+    });
+    sRegex = sRegex.concat(`(?:\\/(?=$))?$/i`);
+    let regextester = new RegExp(sRegex);
+    return regextester.test(url);
+}
+
 const redirectToService = (method, url, fnCallback) => {
-    const routeFound = routes.find((route) => url.startsWith(route.name) && method === route.method );
+    const routeFound = routes.find(
+        (route) => findExpressRegex(route.name, url) && method === route.method );
+    //const routeFound = routes.find((route) => url.startsWith(route.name) && method === route.method );
     if (routeFound) {
         routeFound.fnExec(url, fnCallback, routeFound.fnGetData);
         return true;
@@ -137,40 +156,14 @@ module.exports = {
             const redirected = redirectToService(request.method, url, callback);
 
             if (redirected) {
-            // if (url.startsWith("contas")) {
 
-            //     const createStream = (text) => {
-            //         const rv = new PassThrough() // PassThrough is also a Readable stream
-            //         rv.push(text)
-            //         rv.push(null)
-            //         return rv
-            //     }
-
-            //     web_services.getContas((rows) => {
-            //         const rows_str = rows.map(row => JSON.stringify(row) ).join(",");
-            //         const result = `[${rows_str}]`;
-
-            //         callback({
-            //             mimeType: "application/json",
-            //             data: createStream(result)
-            //         });
-            //     });
-
-            // } else if(url.startsWith("resources")) {
-            //     console.log(`Intercepted! ${request.url} >>> ${url}`);
-            //     const callbURL = join(__dirname, "..", "dist", url);
-            //     console.log(`Normalized to ${callbURL}`);
-
-            //     callback(fs.createReadStream(callbURL));
             } else {
 
                 console.log(`Intercepted! ${request.url} >>> ${url}`);
                 const callbURL = join(__dirname, serveFrom, url);
                 console.log(`Normalized to ${callbURL}`);
 
-                //const fileContent = fs.readFileSync(callbURL);
-
-                callback(fs.createReadStream(callbURL)); //  { url: callbURL });
+                callback(fs.createReadStream(callbURL)); 
             }
         });
     }    

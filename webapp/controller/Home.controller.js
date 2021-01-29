@@ -14,6 +14,10 @@ sap.ui.define([
 
 			this.getRouter().getTarget("home").attachDisplay(jQuery.proxy(this.handleRouteMatched, this));
 
+			const { join } = nodeRequire("path");
+			const { remote } = nodeRequire("electron");
+			this.webs = remote.require(join(__dirname, "..", "electron", "web_services.js"));
+
 		},
 
 		handleRouteMatched: function (oEvt) {
@@ -27,22 +31,30 @@ sap.ui.define([
 			var oView = this.getView();
 			oView.setModel(new JSONModel([{}]), "contas", );
 
-			$.ajax("/contas", {
-				success: function (values) {
-					oView.setModel(new JSONModel(values), "contas", );
-				}
+			this.webs.getContas((rows) => {
+				oView.setModel(new JSONModel(rows), "contas", )
 			});
+
+			// $.ajax("/contas", {
+			// 	success: function (values) {
+			// 		oView.setModel(new JSONModel(values), "contas", );
+			// 	}
+			// });
 		},
 
 		_loadTipoConta: function () {
 			var oView = this.getView();
 			oView.setModel(new JSONModel([{}]), "contas_tipos", );
 
-			$.ajax("/contas_tipos", {
-				success: function (values) {
-					oView.setModel(new JSONModel(values), "contas_tipos", );
-				}
+			this.webs.getContasTipos((rows) => {
+				oView.setModel(new JSONModel(rows), "contas_tipos", )
 			});
+
+			// $.ajax("/contas_tipos", {
+			// 	success: function (values) {
+			// 		oView.setModel(new JSONModel(values), "contas_tipos", );
+			// 	}
+			// });
 		},
 
 		onItemPressNavigate: function (oEvt) { 
@@ -92,18 +104,29 @@ sap.ui.define([
 			var oObject = oModel.getProperty(sPath);
 
 			new Promise(function (fnApprove, fnReject) {
-				$.ajax("/conta/" + oObject._id, {
-					method: "POST",
-					data: oObject,
-					success: function (values) {
-						oObject = values; // values.data = new Date(values.data);
+
+				that.webs.changeConta(oObject, (rows) => {
+					try {
+						oObject = rows;
 						oModel.setProperty(sPath, oObject);
 						fnApprove();
-					},
-					error: function (err) {
+					} catch (err) {
 						fnReject(err);
 					}
 				});
+
+				// $.ajax("/conta/" + oObject._id, {
+				// 	method: "POST",
+				// 	data: oObject,
+				// 	success: function (values) {
+				// 		oObject = values; // values.data = new Date(values.data);
+				// 		oModel.setProperty(sPath, oObject);
+				// 		fnApprove();
+				// 	},
+				// 	error: function (err) {
+				// 		fnReject(err);
+				// 	}
+				// });
 			}).then(function () {
 				Fragment.load({
 					id: oView.getId(),
