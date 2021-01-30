@@ -218,7 +218,6 @@ sap.ui.define([
 			oObject.data = oObject.data.toISOString().substr(0,10);
 
 			new Promise(function (fnApprove, fnReject) {
-
 				that.webs.changeLancamento(oObject, 
 					(values) => {
 						values.data = new Date(values.data);

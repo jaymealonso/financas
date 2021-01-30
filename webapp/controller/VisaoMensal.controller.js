@@ -9,21 +9,19 @@ sap.ui.define([
 	return BaseController.extend("sap.ui.demo.basicTemplate.controller.VisaoMensal", {
 
         onInit: function () {
-			this.getRouter().getTarget("visao_mensal").attachDisplay(jQuery.proxy(this.handleRouteMatched, this));
+			this.getRouter().getTarget("visao_mensal").attachDisplay(
+				jQuery.proxy(this.handleRouteMatched, this));
 
 			const { join } = nodeRequire("path");
 			const { remote } = nodeRequire("electron");
 			this.webs = remote.require(join(__dirname, "..", "electron", "web_services.js"));
 		},
 		
-		sContaId: null, 
-
 		handleRouteMatched: function  (oEvt) {
-
             this.sContaId = oEvt.getParameter("data").cnt;
 
-            this._loadData( );
-
+			this._loadData( );
+			this._loadCategorias( );			
         },
 
         _loadData: function (oEvt) {
@@ -34,15 +32,18 @@ sap.ui.define([
 			this.webs.getVisaoMensal({conta_id: this.sContaId}, (values) => {
 				oView.setModel(new JSONModel(values), "visao_geral");
 			});
-
-			// $.ajax("/conta/" + this.sContaId + "/visao_mensal", {
-			// 	success: function (values) {
-			// 		oView.setModel(new JSONModel(values), "visao_geral");
-			// 	}
-			// });
         },
 
-        onBackPress: function () {
+		_loadCategorias: function () {
+			var oView = this.getView();
+			oView.setModel(new JSONModel([{}]), "categorias");
+
+			this.webs.getCategorias(
+				(values) => oView.setModel(new JSONModel(values), "categorias")
+			);
+		},
+
+		onBackPress: function () {
 			const electron = nodeRequire("electron");
 			const ipc = electron.ipcRenderer;
 			ipc.send("go-back-button");
@@ -112,7 +113,6 @@ sap.ui.define([
 		},
 
 		onBtnLancDetalhesPress: function (oEvt) {
-			
 			var oNumber = oEvt.getSource().getParent().getItems()[0];
 			var oRow = oEvt.getSource().getParent().getParent();
 			var oModel = oEvt.getSource().getModel("visao_geral");
@@ -124,13 +124,6 @@ sap.ui.define([
 			var sCategID = oModel.getProperty(sPath);
 			var sAnoMes = oNumber.getBindingInfo("number").parts[0].path;
 
-			// var sValues = `ano_mes=${sAnoMes}`
-			if (sCategID) {
-				sValues = `${sValues}&categoria_id=${sCategID}`;
-			}
-
-			// var sURL = `/conta/${this.sContaId}/lancamentos?${sValues}`;
-
 			var that = this;
 
 			this.webs.getLancamentos(
@@ -138,6 +131,7 @@ sap.ui.define([
 				{ conta_id: this.sContaId, ano_mes: sAnoMes, categoria_id: sCategID }, 
 				(values) => {
 					var oView = that.getView();
+					values.forEach((value) => value.changed = false);
 					oView.setModel(new JSONModel(values), "vg_lanc_pop");
 					Fragment.load({
 						name: "sap.ui.demo.basicTemplate.view.VisaoMensal-LancPop",
@@ -147,22 +141,41 @@ sap.ui.define([
 						oDialog.open();
 				});
 			});
-
-			// $.ajax(sURL, {
-			// 	success: function (values) {
-			// 		var oView = that.getView();
-			// 		oView.setModel(new JSONModel(values), "vg_lanc_pop");
-			// 		Fragment.load({
-			// 			name: "sap.ui.demo.basicTemplate.view.VisaoMensal-LancPop",
-			// 			controller: that
-			// 		}).then(function (oDialog) {
-			// 			oView.addDependent(oDialog);
-			// 			oDialog.open();
-			// 		})
-
-			// 	}
-			// });
 		},
+		
+		onCmbCategSelChange: function (oEvt) {
+			const tableLine = oEvt.getSource().getParent();
+			const sPath = tableLine.getBindingContextPath();
+			const oModel = this.getView().getModel("vg_lanc_pop");
+			oModel.setProperty(`${sPath}/changed`, true);
+		},
+
+		onLancAcceptPress: function (oEvt) {
+			const lancamentos = this.getView().getModel("vg_lanc_pop");
+			const oPopup = oEvt.getSource().getParent();
+			const that = this;
+
+			var aPromises = [];
+			lancamentos.getData().forEach(lancamento => {
+				if (lancamento.changed) {
+					aPromises.push(new Promise((approve, reject) => {
+						try {
+							lancamento.data = lancamento.data.toISOString();
+							that.webs.changeLancamento(lancamento, 
+								(values) => {
+									approve(values);
+								}
+							);
+						} catch (err) { reject(err); }
+					}));
+				}
+			});
+			Promise.all(aPromises).then(() => {
+				this._loadData( );
+				oPopup.close();
+			});
+		},
+
 		onLancPopFecharPress: function (oEvt) {
 			oEvt.getSource().getParent().close();
 		}

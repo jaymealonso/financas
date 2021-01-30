@@ -3,10 +3,6 @@ const Sqlite3 = require('better-sqlite3');
 const Path = require('path');
 const databaseFileFullPath = Path.normalize(`${__dirname}/../db/financas.db`);
 
-console.log(`
-  2 process ${process.env.DB_LOG_ACTIVE}
-`);
-
 const log = (text, ...vars) => {
     if (process.env.DB_LOG_ACTIVE) {
         console.log(text, ...vars);

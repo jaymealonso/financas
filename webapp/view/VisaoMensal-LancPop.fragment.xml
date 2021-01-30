@@ -2,11 +2,64 @@
     xmlns="sap.m"
     xmlns:core="sap.ui.core" >
 
-    <Dialog title="Categorias" class="sapUiSizeCompact">
-        <endButton>
+    <Dialog title="Lançamentos" class="sapUiSizeCompact">
+        <buttons>
+            <Button text="Confirmar" type="Accept" press="onLancAcceptPress" />
             <Button text="Fechar" press="onLancPopFecharPress" />
-        </endButton>
+        </buttons>
         <content>
+
+        <table items="{vg_lanc_pop>/}">
+            <columns>
+                <Column width="8em">
+                    <Text text="Ref" />
+                </Column>
+                <Column>
+                    <Text text="Descrição" />
+                </Column>
+                <Column width="16em">
+                    <Text text="Categoria" />
+                </Column>
+                <Column width="8em" hAlign="Center">
+                    <Text text="Data" />
+                </Column>
+                <Column width="8em" hAlign="End">
+                    <Text text="Valor" />
+                </Column>
+            </columns>
+            <items>
+                <ColumnListItem>
+                    <cells>
+                        <Text text="{vg_lanc_pop>nr_referencia}" />
+                        <Text text="{vg_lanc_pop>descricao}" />
+                        <ComboBox
+                            items="{path: 'categorias>/', templateShareable:true }" enabled="{= ${conf>/ColumnType} === 'Active' }"
+                            selectedKey="{vg_lanc_pop>categoria_id}" selectionChange="onCmbCategSelChange">
+                            <items>
+                                <core:Item key="{categorias>_id}" text="{categorias>nm_categoria}" />
+                            </items>
+                        </ComboBox>  
+                        <Text text="{
+                            path: 'vg_lanc_pop>data',
+                            type: 'sap.ui.model.type.Date',
+                            formatOptions: {
+                                style: 'short'
+                            }
+                        }" />
+                        <Text text="{ 
+                            parts: [{path: 'vg_lanc_pop>valor'}, {path: 'vg_lanc_pop>moeda'}], 
+                            type: 'sap.ui.model.type.Currency',
+                            formatOptions: {
+                                minFractionDigits: 2,
+                                showMeasure: false
+                            }								
+                        }" />
+                        
+                    </cells>
+                </ColumnListItem>
+            </items>
+        </table>
+<!-- 
             <List items="{vg_lanc_pop>/}" >
                 <items>
                     <ObjectListItem title="{vg_lanc_pop>descricao}" 
@@ -20,10 +73,9 @@
                         }"                         
                         numberUnit="{path: 'vg_lanc_pop>moeda'}"
                         numberState="{= ${vg_lanc_pop>valor} &lt; 0 ? 'Error' : 'Success' }"
-                        
                         />
                 </items>
-            </List>
+            </List> -->
         </content>
     </Dialog>
 

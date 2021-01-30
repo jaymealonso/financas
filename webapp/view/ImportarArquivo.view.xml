@@ -6,7 +6,7 @@
 	xmlns:f="sap.ui.layout.form"
 	xmlns:mvc="sap.ui.core.mvc">
 	<Page id="page" 
-		title="{i18n>title-imp_arq}">
+		title="{i18n>title-imp_arq}" showNavButton="true" navButtonPress="onBackPress">
 		<content>
 			<!-- <u:FileUploader
 				id="fileUploader"

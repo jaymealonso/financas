@@ -1,10 +1,5 @@
 /* eslint-disable strict */
-const result = require('dotenv').config();
-console.log(`
-  env vars ${JSON.stringify(result)}
-  process ${process.env.DB_LOG_ACTIVE}
-`);
-
+require('dotenv').config();
 const { join } = require('path');
 const { ipcMain, app, BrowserWindow } = require('electron');
 
