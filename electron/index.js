@@ -3,8 +3,8 @@ require('dotenv').config();
 const { join } = require('path');
 const { ipcMain, app, BrowserWindow } = require('electron');
 
-//const ROOT_URL = join(__dirname, '..', 'webapp', 'index.html');
-const ROOT_URL = join(__dirname, '..', 'dist', 'index.html');
+const ROOT_URL = join(__dirname, '..', 'webapp', 'index.html');
+//const ROOT_URL = join(__dirname, '..', 'dist', 'index.html');
 
 /* prevent App launching after install */
 if (require('electron-squirrel-startup')) app.quit();
@@ -53,7 +53,7 @@ const createWindow = () => {
     // mainWindow.webContents.openDexevTools({ mode: 'detach' });  
     
   // não funciona o codigo abaixo quando é chamado da rede dentro da VM (fix acima)
-  //  mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
 
     mainWindow.on('closed', () => {
       mainWindow = null;

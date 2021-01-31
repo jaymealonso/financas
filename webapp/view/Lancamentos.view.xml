@@ -9,7 +9,7 @@
 		id="page"
 		title="{conf>/PageTitle}" showNavButton="true" navButtonPress="onBackPress">
 		<content>
-			<Table items="{lancamentos>/}" itemPress="onLancItemPress" mode="{conf>/TableLancamentosMode}" delete="onTableLancDelete" 
+			<Table id="tblLancamentos" items="{lancamentos>/}" itemPress="onLancItemPress" mode="{conf>/TableLancamentosMode}" delete="onTableLancDelete" 
 				fixedLayout="true" >
 				<headerToolbar>
 					<OverFlowToolbar>

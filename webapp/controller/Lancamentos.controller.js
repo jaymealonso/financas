@@ -2,8 +2,9 @@ sap.ui.define([
 	"./Base",
 	"../model/formatter",
 	"sap/ui/model/json/JSONModel",
-	"sap/ui/core/Fragment"
-], function(BaseController, formatter, JSONModel, Fragment) {
+	"sap/ui/core/Fragment",
+	"sap/m/MessageToast"
+], function(BaseController, formatter, JSONModel, Fragment, MessageToast) {
 	"use strict";
 
 	return BaseController.extend("sap.ui.demo.basicTemplate.controller.Lancamentos", {
@@ -88,18 +89,28 @@ sap.ui.define([
 			var oBundle = oView.getModel("i18n").getResourceBundle();			
 			oView.setModel(new JSONModel({}), "lancamentos");
 			
-			this.webs.getLancamentos(
-				// eslint-disable-next-line camelcase
-				{ conta_id: this.sContaId },
-				(values) => {
-					for (var i in values) {
-						values[i].data = new Date(values[i].data);
+			const oTable = oView.byId("tblLancamentos");
+
+			oTable.setBusyIndicatorDelay(0);
+			oTable.setBusy(true);
+
+			
+			return new Promise((approve, reject) => {
+				this.webs.getLancamentos(
+					// eslint-disable-next-line camelcase
+					{ conta_id: this.sContaId },
+					undefined,
+					(values) => {
+						oView.setModel(new JSONModel(values), "lancamentos");
+						var sTitle = oBundle.getText("title-lanc", [values.length]);
+						oModelCnf.setProperty("/TableLancamentosTitle", sTitle);
+						approve();
 					}
-					oView.setModel(new JSONModel(values), "lancamentos");
-					var sTitle = oBundle.getText("title-lanc", [values.length]);
-					oModelCnf.setProperty("/TableLancamentosTitle", sTitle);
-				}
+				);
+			}).finally(() => 
+				oTable.setBusy(false)
 			);
+
 
 			// $.ajax("/conta/" + this.sContaId + "/lancamentos", {
 			// 	success: function (values) {
@@ -112,6 +123,32 @@ sap.ui.define([
 			// 	}
 			// });
 		},
+
+		// onLancUpdateStarted: function (oEvt, a, b) {
+
+		// 	const oModel = this.getView().getModel("lancamentos");
+		// 	var aData = oModel.getData();
+		// 	var emptyObj = {};
+		// 	aData = JSON.stringify(emptyObj) === JSON.stringify(aData) ? new Array(0) : aData;
+
+		// 	return new Promise((approve, reject) => {
+		// 		this.webs.getLancamentos(
+		// 			// eslint-disable-next-line camelcase
+		// 			{ conta_id: this.sContaId },
+		// 			{ limit: 10, offset: aData.length },
+		// 			(values) => {
+		// 				aData.push(values);
+		// 				if (!aData) reject();
+		// 				oModel.setData(aData);
+		// 				var sTitle = oBundle.getText("title-lanc", [values.length]);
+		// 				oModelCnf.setProperty("/TableLancamentosTitle", sTitle);
+		// 				approve();
+		// 			}
+		// 		)
+		// 	});
+
+		// 	MessageToast.show("Update Started.");
+		// },
 
 		onBackPress: function () {
 			const electron = nodeRequire("electron");
@@ -278,7 +315,7 @@ sap.ui.define([
 			});
 		},
 
-		onCmbCategSelChange: function (oEvt) {
+		onCmbCategChange: function (oEvt) {
 			var oCmb = oEvt.getSource();
 			var oListItem = oCmb.getParent();
 			var oView = this.getView();

@@ -18,7 +18,7 @@ xmlns:core="sap.ui.core" >
 
         <ComboBox
             items="{path: 'categorias>/', templateShareable:true }" enabled="{= ${conf>/ColumnType} === 'Active' }"
-            selectedKey="{lancamentos>categoria_id}" selectionChange="onCmbCategSelChange">
+            selectedKey="{lancamentos>categoria_id}" change="onCmbCategChange">
             <items>
                 <core:Item key="{categorias>_id}" text="{categorias>nm_categoria}" />
             </items>

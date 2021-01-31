@@ -118,8 +118,9 @@ function getContasTipos (fnCallbackRender) {
     fnCallbackRender(rows);
 }
 
-function getLancamentos(oObject, fnCallbackRender) {
+function getLancamentos(oObject, oLimOf, fnCallbackRender) {
     var sAditionalQuery = "";
+    var oLimOfLocal = oLimOf || { limit: -1, offset: -1 }
     
     if (oObject.ano_mes) {
         sAditionalQuery = `AND l.data like @ano_mes`;
@@ -131,6 +132,8 @@ function getLancamentos(oObject, fnCallbackRender) {
         // eslint-disable-next-line camelcase
         oObject.ano_mes = `${oObject.ano_mes}%`;
     }
+    oObject.limit = oLimOfLocal.limit;
+    oObject.offset = oLimOfLocal.offset;
 
     let sql = `
         select l.*
@@ -143,6 +146,7 @@ function getLancamentos(oObject, fnCallbackRender) {
         where conta_id = @conta_id
         ${sAditionalQuery}
         order by l.data
+        limit @limit offset @offset
         `;
 
     let stmt = db.prepare(sql);
