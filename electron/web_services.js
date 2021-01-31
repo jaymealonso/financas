@@ -9,34 +9,37 @@ const log = (text, ...vars) => {
     }
 }
 
+var db;
+
 const connect = () => {
-    var db = new Sqlite3(databaseFileFullPath, { verbose: log });
-        
     if (db) {
-        log('Connected to the financas.db database (READ_WRITE).');
+        console.log('Already connected to the financas.db database (READ_WRITE).');
     } else {
-        log('Erro ao conectar na DB.');
+        db = new Sqlite3(databaseFileFullPath, { verbose: log });
+        if (db) {
+            log('Connected to the financas.db database (READ_WRITE).');
+        } else {
+            log('Erro ao conectar na DB.');
+        }
     }
     return db;
 }
 
-const db = connect();
-
 const readConta = (sContaId, fnCallbackRender) => {
     let sql = `
-select c._id, c.descricao, c.numero, c.moeda, c.tipo, ct.descricao as tipo_descricao,
-    ( select count(*) 
-        from lancamentos as l 
-             left outer join lancamento_categoria as lc on lc.lancamento_id = l._id
-       where l.conta_id = c._id 
-         and lc.lancamento_id is null ) as count_n_categ,
-    ( select count(*) 
-        from lancamentos as l1 
-             inner join lancamento_categoria as lc1 on lc1.lancamento_id = l1._id
-       where l1.conta_id = c._id ) as count_categ
-from contas as c
-     inner join contas_tipo as ct on ct._id = c.tipo
-where c._id = ?
+        select c._id, c.descricao, c.numero, c.moeda, c.tipo, ct.descricao as tipo_descricao,
+            ( select count(*) 
+                from lancamentos as l 
+                    left outer join lancamento_categoria as lc on lc.lancamento_id = l._id
+            where l.conta_id = c._id 
+                and lc.lancamento_id is null ) as count_n_categ,
+            ( select count(*) 
+                from lancamentos as l1 
+                    inner join lancamento_categoria as lc1 on lc1.lancamento_id = l1._id
+            where l1.conta_id = c._id ) as count_categ
+        from contas as c
+            inner join contas_tipo as ct on ct._id = c.tipo
+        where c._id = ?
         `; 
 
     let stmt = db.prepare(sql);
@@ -70,18 +73,18 @@ function readLancamento(sLancId, fnCallbackRender) {
 
 function getContas (fnCallbackRender) {
     let sql = `
-select c._id, c.descricao, c.numero, c.moeda, c.tipo, ct.descricao as tipo_descricao,
-    ( select count(*) 
-        from lancamentos as l 
-             left outer join lancamento_categoria as lc on lc.lancamento_id = l._id
-       where l.conta_id = c._id 
-         and lc.lancamento_id is null ) as count_n_categ,
-    ( select count(*) 
-        from lancamentos as l1 
-             inner join lancamento_categoria as lc1 on lc1.lancamento_id = l1._id
-       where l1.conta_id = c._id ) as count_categ
-from contas as c
-     inner join contas_tipo as ct on ct._id = c.tipo
+        select c._id, c.descricao, c.numero, c.moeda, c.tipo, ct.descricao as tipo_descricao,
+            ( select count(*) 
+                from lancamentos as l 
+                    left outer join lancamento_categoria as lc on lc.lancamento_id = l._id
+            where l.conta_id = c._id 
+                and lc.lancamento_id is null ) as count_n_categ,
+            ( select count(*) 
+                from lancamentos as l1 
+                    inner join lancamento_categoria as lc1 on lc1.lancamento_id = l1._id
+            where l1.conta_id = c._id ) as count_categ
+        from contas as c
+            inner join contas_tipo as ct on ct._id = c.tipo
         `;
 
     let stmt = db.prepare(sql);
@@ -261,10 +264,6 @@ function getVisaoMensal(oValores, fnCallbackRender) {
 
 }
 
-const newConta = () => {
-
-}
-
 function newLancamento (oValores, fnCallbackRender) {
 
     let oValues = oValores;
@@ -289,6 +288,26 @@ function newLancamento (oValores, fnCallbackRender) {
     }
 
     fnCallbackRender(oValues);
+}
+
+const newConta = (oValores ,fnCallbackRender) => {
+    let sql = 
+      `INSERT INTO contas values (@id, @descricao, @numero, @moeda, @tipo);`;
+
+    let insert = db.prepare(sql);
+    let info = insert.run({
+        id: null, 
+        descricao: "Nova Conta",
+        numero: "",
+        moeda: "EUR",
+        tipo: "1"
+    });
+    if (info) {
+        var sDateTimeStamp = new Date().toISOString();
+        log( `${sDateTimeStamp} > INSERT Conta: ${JSON.stringify(info)}` );
+    }
+  
+    fnCallbackRender(info);
 }
 
 function newCategoria(oValores ,fnCallbackRender) {
@@ -409,6 +428,37 @@ function deleteLancamentoCategoria (sLancId, fnCallbackRender) {
     fnCallbackRender(info);
 }
 
+function deleteConta (sContaId, fnCallbackRender) {
+
+    if (!sContaId) { return; }
+
+    sContaId = sContaId.toString();
+
+    let sql = `       
+        DELETE FROM lancamento_categoria
+        WHERE lancamento_id in (
+                SELECT _id
+                FROM lancamentos 
+                WHERE conta_id = @conta_id )
+    `
+    let cDelete = db.prepare(sql);
+    // eslint-disable-next-line camelcase    
+    let info0 = cDelete.run({conta_id: sContaId});
+
+    sql = `DELETE FROM lancamentos WHERE conta_id = @conta_id`;
+    cDelete = db.prepare(sql);
+    // eslint-disable-next-line camelcase
+    let info1 = cDelete.run({conta_id: sContaId});
+
+    sql = `DELETE FROM contas WHERE _id = @conta_id`;
+    cDelete = db.prepare(sql);
+    // eslint-disable-next-line camelcase
+    let info2 = cDelete.run({conta_id: sContaId});
+
+    fnCallbackRender([info0, info1, info2]);
+
+}
+
 function deleteLancamento (sConta, sLancId, fnCallbackRender) {
 
     let sql = `DELETE FROM lancamentos WHERE conta_id = @conta_id AND _id = @id`;
@@ -514,6 +564,7 @@ module.exports = {
     newCategoria: newCategoria,
     changeConta: changeConta,
     changeLancamento: changeLancamento,
+    deleteConta: deleteConta,
     deleteLancamento: deleteLancamento,
     readConta: readConta,
     openAndParseFile: openAndParseFile,

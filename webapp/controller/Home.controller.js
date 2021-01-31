@@ -2,8 +2,9 @@ sap.ui.define([
 	"./Base",
 	"../model/formatter",
 	"sap/ui/model/json/JSONModel",
-	"sap/ui/core/Fragment"
-], function(BaseController, formatter, JSONModel, Fragment) {
+	"sap/ui/core/Fragment",
+	"sap/m/MessageBox"
+], function(BaseController, formatter, JSONModel, Fragment, MessageBox) {
 	"use strict";
 
 	return BaseController.extend("sap.ui.demo.basicTemplate.controller.Home", {
@@ -25,6 +26,11 @@ sap.ui.define([
 
 			this._loadContas( );
 			this._loadTipoConta( );
+			const oView = this.getView();
+			oView.setModel(new JSONModel({
+				"TableContasMode" : "None",
+				"ColumnType": "Active"
+			}), "conf");
 
 		},
 
@@ -65,6 +71,52 @@ sap.ui.define([
 			var sIdConta = oModel.getProperty(sPath + '/_id');
 			this.getRouter().navTo("cnt_lancamentos", { "cnt": sIdConta } );
 
+		},
+
+		onNewConta: function (oEvt) {
+			this.webs.newConta( {}, 
+				() => this._loadContas( )
+			);
+		},
+
+		onEliminarTogglePress: function (oEvt) {
+			var oView = this.getView();
+			var oModel = oView.getModel("conf");
+			if (oModel.getProperty("/TableContasMode") === "None") { 
+				oModel.setProperty("/TableContasMode", "Delete");
+			} else {
+				oModel.setProperty("/TableContasMode", "None");
+			}
+		},
+
+		onTableContaDelete: function (oEvt) { 
+			const that = this;
+			const oBundle = this.getView().getModel("i18n").getResourceBundle();
+			const oListItm = oEvt.getParameter("listItem");
+			const oModel = this.getView().getModel("contas");
+			const oModelCnf = this.getView().getModel("conf");
+			const sPath = oListItm.getBindingContextPath();
+			const oObject = oModel.getProperty(sPath);
+			const fnFinishedReload = () => {
+				oModelCnf.setProperty("/TableContasMode", "None");
+				that._loadContas();
+			}
+			const sConfirmarText = oBundle.getText("home-delete-account-pop-confirm");
+			if ((oObject.count_n_categ + oObject.count_categ) > 0) {
+				MessageBox.confirm(oBundle.getText("home-delete-account-pop-text"), {
+					styleClass: "sapUiSizeCompact",
+					actions: [sConfirmarText, MessageBox.Action.CLOSE],
+					emphasizedAction: sConfirmarText,
+					onClose: (sAction) => {
+						if (sAction === sConfirmarText) {
+							this.webs.deleteConta(oObject._id, (result) => fnFinishedReload(result));
+						}
+						
+					}
+				});
+			} else {
+				this.webs.deleteConta(oObject._id, (result) => fnFinishedReload(result));
+			}
 		},
 
 		onContaLancamentosPress: function (oEvt) { 

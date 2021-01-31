@@ -8,12 +8,13 @@
 		id="page"
 		title="{i18n>title}">
 		<content>
-			<Table items="{contas>/}">
+			<Table items="{contas>/}" mode="{conf>/TableContasMode}" delete="onTableContaDelete">
 				<headerToolbar>
 					<OverFlowToolbar>
 						<Title text="{i18n>home-title-contas}" />
 						<ToolbarSpacer />
 						<Button icon="sap-icon://create" text="{i18n>home-btn-novaconta}" press="onNewConta" />
+						<Button icon="sap-icon://delete" tooltip="Eliminar Conta" press="onEliminarTogglePress" enabled="{= ${conf>/ColumnType} === 'Active' }" />
 					</OverFlowToolbar>
 				</headerToolbar>
 				<columns>

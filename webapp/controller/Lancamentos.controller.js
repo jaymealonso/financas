@@ -191,15 +191,14 @@ sap.ui.define([
 			var that = this;
 			var oListItem = oEvt.getParameter("listItem");
 			var oView = this.getView();
-			// var oModel = oView.getModel("conf");
+			var oModel = oView.getModel("conf");
 			Fragment.load({
 				id: oView.getId(),
 				name: "sap.ui.demo.basicTemplate.view.Lancamento-edit",
 				controller: that
-			}).then(function (oLancEdit) {
-				// - teste descomentar - 
-				// oModel.setProperty("/ColumnType", "Inactive");
-				// oModel.setProperty("/TableLancamentosMode", "None");
+			}).then((oLancEdit) => {
+				oModel.setProperty("/ColumnType", "Inactive");
+				oModel.setProperty("/TableLancamentosMode", "None");
 
 				that._replaceListItem(oListItem, oLancEdit);
 			});
