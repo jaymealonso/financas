@@ -41,12 +41,6 @@ sap.ui.define([
 			this.webs.getContas((rows) => {
 				oView.setModel(new JSONModel(rows), "contas", )
 			});
-
-			// $.ajax("/contas", {
-			// 	success: function (values) {
-			// 		oView.setModel(new JSONModel(values), "contas", );
-			// 	}
-			// });
 		},
 
 		_loadTipoConta: function () {
@@ -56,16 +50,9 @@ sap.ui.define([
 			this.webs.getContasTipos((rows) => {
 				oView.setModel(new JSONModel(rows), "contas_tipos", )
 			});
-
-			// $.ajax("/contas_tipos", {
-			// 	success: function (values) {
-			// 		oView.setModel(new JSONModel(values), "contas_tipos", );
-			// 	}
-			// });
 		},
 
 		onItemPressNavigate: function (oEvt) { 
-
 			var oModel = this.getView().getModel("contas");
 			var sPath = oEvt.getParameter("listItem").getBindingContextPath();
 			var sIdConta = oModel.getProperty(sPath + '/_id');
@@ -167,19 +154,6 @@ sap.ui.define([
 						fnReject(err);
 					}
 				});
-
-				// $.ajax("/conta/" + oObject._id, {
-				// 	method: "POST",
-				// 	data: oObject,
-				// 	success: function (values) {
-				// 		oObject = values; // values.data = new Date(values.data);
-				// 		oModel.setProperty(sPath, oObject);
-				// 		fnApprove();
-				// 	},
-				// 	error: function (err) {
-				// 		fnReject(err);
-				// 	}
-				// });
 			}).then(function () {
 				Fragment.load({
 					id: oView.getId(),
@@ -225,8 +199,5 @@ sap.ui.define([
 			var sIdConta = oModel.getProperty(sPath + '/_id');
 			this.getRouter().navTo("visao_mensal", { "cnt": sIdConta } );
 		}
-
-
-
 	});
 });

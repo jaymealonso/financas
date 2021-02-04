@@ -1,4 +1,5 @@
 /* eslint-disable strict */
+require('dotenv').config();
 const Sqlite3 = require('better-sqlite3');
 const Path = require('path');
 const databaseFileFullPath = Path.normalize(`${__dirname}/../db/financas.db`);

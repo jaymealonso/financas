@@ -3,18 +3,18 @@ require('dotenv').config();
 const { join } = require('path');
 const { ipcMain, app, BrowserWindow } = require('electron');
 
-const ROOT_URL = join(__dirname, '..', 'webapp', 'index.html');
-//const ROOT_URL = join(__dirname, '..', 'dist', 'index.html');
+console.log(`Ambiente definido para: ${process.env.ENVIROMENT}`);
+var rootdir = process.env.ENVIROMENT === 'development' ? 'webapp' :  'dist'
+const ROOT_URL = join(__dirname, '..', rootdir, 'index.html');
 
 /* prevent App launching after install */
 if (require('electron-squirrel-startup')) app.quit();
 
 /* Create DB Structure - se não existir já */
-const db = require(join(__dirname, '..', 'db', 'create_db.js'));
+const db = require(join(__dirname, 'create_db.js'));
 db.createDataBaseFromFile();
 
 let mainWindow;
-
 /*
   // linha abaixo nao funciona, mas talvez no futuro
   app.commandLine.appendSwitch('lang', 'pt-br');

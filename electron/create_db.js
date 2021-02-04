@@ -1,9 +1,9 @@
 /* eslint-disable strict */
 const sqlite3 = require('better-sqlite3');
 const fs = require('fs');
-const path = require('path');
-const databaseFileFullPath = path.normalize(`${__dirname}/financas.db`);
-const creationScriptFullPath = path.normalize(`${__dirname}/create_db.sql`);
+const { join } = require('path');
+const databaseFileFullPath = join(__dirname, "..", "db", "financas.db");
+const creationScriptFullPath = join(__dirname, "..", "db", "create_db.sql");
 
 const createDataBaseFromFile = () => {
 

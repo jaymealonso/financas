@@ -75,12 +75,6 @@ sap.ui.define([
 			this.webs.getCategorias(
 				(values) => oView.setModel(new JSONModel(values), "categorias")
 			);
-
-			// $.ajax("/categorias", {
-			// 	success: function (values) {
-			// 		oView.setModel(new JSONModel(values), "categorias");		
-			// 	}
-			// });
 		},
 
 		_loadLancamentos: function ( ) {
@@ -110,18 +104,6 @@ sap.ui.define([
 			}).finally(() => 
 				oTable.setBusy(false)
 			);
-
-
-			// $.ajax("/conta/" + this.sContaId + "/lancamentos", {
-			// 	success: function (values) {
-			// 		for (var i in values) {
-			// 			values[i].data = new Date(values[i].data);
-			// 		}
-			// 		oView.setModel(new JSONModel(values), "lancamentos");
-			// 		var sTitle = oBundle.getText("title-lanc", [values.length]);
-			// 		oModelCnf.setProperty("/TableLancamentosTitle", sTitle);
-			// 	}
-			// });
 		},
 
 		// onLancUpdateStarted: function (oEvt, a, b) {

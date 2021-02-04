@@ -71,15 +71,21 @@ npm install electron-rebuild
 - [ ] Filtros(Live) nos Lançamentos
 - [ ] Split de lançamentos em dois ou mais lançamentos com categorias próprias
 - [ ] Matching de lançamentos pre-existentes com categorias
-### Importar arquivo
+### Importar arquivo extrato
 - [ ] Salvar configurações de importação (formato data/separador milhar/decimais)
 - [ ] Visão arquivo excel processado antes da importação
 - [ ] Importação de CSV
 - [ ] Importação em janela pop-up "Modal"
-### Visão de arquivos armazenados por Ano / Mes
+### Visão de arquivos anexo armazenados por Ano / Mes
 - [ ] Armazenamento de arquivos com ligação para Lançamentos
 - [ ] Navegação da "Visão de arquivos armazenados por Ano / Mes" para Lançamentos
 ## Talvez / infraestrutura
 - [ ] Portar frontend para fora do UI5
 - [ ] Portar Banco de Dados para MongoDB
 - [ ] Portar app para NodeGUI (+ performance -tamanho arquivo app) (NodeGUI ainda está Beta com pequeno suporte a componentes avançados)
+- [ ] Montar configura��o de build para:
+  - criar .env para dev/producao
+  - criar splash de instala��o
+  - remover arquivos do diretorio webapp
+  - remover financas.db do instalador
+  - gerar numera��o de vers�o
