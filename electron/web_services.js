@@ -3,9 +3,12 @@ require('dotenv').config();
 const Sqlite3 = require('better-sqlite3');
 const Path = require('path');
 const databaseFileFullPath = Path.normalize(`${__dirname}/../db/financas.db`);
+const { dialog, shell } = require('electron');
+const fs = require('fs');
+const { DateTime } = require('luxon');
 
 const log = (text, ...vars) => {
-    if (process.env.DB_LOG_ACTIVE) {
+    if (process.env.DB_LOG_ACTIVE === "true") {
         console.log(text, ...vars);
     }
 }
@@ -18,9 +21,9 @@ const connect = () => {
     } else {
         db = new Sqlite3(databaseFileFullPath, { verbose: log });
         if (db) {
-            log('Connected to the financas.db database (READ_WRITE).');
+            console.log('Connected to the financas.db database (READ_WRITE).');
         } else {
-            log('Erro ao conectar na DB.');
+            console.error('Erro ao conectar na DB.');
         }
     }
     return db;
@@ -59,6 +62,9 @@ function readLancamento(sLancId, fnCallbackRender) {
             from lancamento_categoria as lc 
             where lc.lancamento_id = l._id ) as categoria_id
         ,c.nm_categoria
+        ,( select count(*)
+            from lancamento_anexos as an 
+            where an.lancamento_id = l._id ) as anexos
         from lancamentos as l 
             left outer join categorias as c on c._id = categoria_id
         where l._id = ?`;
@@ -142,6 +148,9 @@ function getLancamentos(oObject, oLimOf, fnCallbackRender) {
             from lancamento_categoria as lc 
             where lc.lancamento_id = l._id ) as categoria_id
         ,c.nm_categoria
+        ,( select count(*)
+            from lancamento_anexos as an 
+            where an.lancamento_id = l._id ) as anexos
         from lancamentos as l 
             left outer join categorias as c on c._id = categoria_id
         where conta_id = @conta_id
@@ -493,8 +502,6 @@ function parseFile(oFile, fnCallbackRender) {
 }
 
 const openAndParseFile = async (fnCallbackRender) => {
-    const { dialog } = require('electron')
-    const fs = require('fs');
     const files = await dialog.showOpenDialog({ properties: ['openFile'] });
     if (files.filePaths[0]) {
         parseFile(
@@ -541,23 +548,90 @@ function parseFileExcel(oFile)  {
 
 }
 
-// function parseFileCSV(sFileString) {
-//     var oOutObj = {};
-//     var aLines = sFileString.split("\r\n");
-    
-//     for (var iIndLine in aLines) { 
-//         var aValues =  aLines[iIndLine].split(";");
-//         var oParsedLine = {}
-//         for (var iIndValue in aValues) {
-//             oParsedLine[iIndValue] = aValues[iIndValue];
-//         }
-//         oOutObj[iIndLine] = oParsedLine;
-//     }
-//     return oOutObj;
-// }
+// eslint-disable-next-line camelcase
+const uploadAnexoFile = (lancamento_id, data) => new Promise( async (resolve, reject) => {
+    const files = await dialog.showOpenDialog({ properties: ['openFile'] });
+    const filePathToCopy = files.filePaths[0];
+    let date, filename, destination;
+    if (!filePathToCopy) {
+        return reject();
+    }
+
+    date = DateTime.fromISO(data);
+    filename = Path.basename(filePathToCopy);
+    destinationFolder = Path.join(__dirname, "..", "anexo", `${date.toFormat("yyyy.MM")}`);
+    await fs.promises.mkdir(destinationFolder, { recursive: true }).catch(
+        () => { return reject(err) }
+    );
+    destination = Path.join(destinationFolder, filename);
+    await fs.promises.copyFile(filePathToCopy, destination, fs.constants.COPYFILE_EXCL, 
+        (err) => { 
+            if (err) { 
+                return reject(err) 
+            }
+            return 0;
+        }
+    );
+
+
+    let oValues = {
+        id: null, 
+        // eslint-disable-next-line camelcase
+        lancamento_id: lancamento_id,  
+        ano: date.toFormat("yyyy"),
+        mes: date.toFormat("MM"),
+        // eslint-disable-next-line camelcase
+        descricao: filename, 
+        caminho: destination
+    };
+    let sql = 
+        `INSERT INTO lancamento_anexos VALUES (@id, @lancamento_id, @ano, @mes, @descricao, @caminho);`
+
+    let insert = db.prepare(sql);
+    let info = insert.run(oValues);
+    if (info) {
+        var sDateTimeStamp = new Date().toISOString();
+        log( `${sDateTimeStamp} > INSERT Lançamento_Anexo ID: ${this.lastInsertRowid}` );
+        oValues._id = info.lastInsertRowid;
+    }
+
+    resolve(oValues);
+});
+
+const getAnexoFiles = (idLancamento) => new Promise( async (resolve, reject) => { 
+    try {
+        let sql = `
+            select * from lancamento_anexos 
+                where lancamento_id = @lancamento_id;
+            `;
+
+        let stmt = db.prepare(sql);
+        let rows = stmt.all({lancamento_id: idLancamento});
+
+        var sDateTimeStamp = new Date().toISOString();
+        let aId = [];
+        rows.forEach((row) => {
+            aId.push(row._id);
+        });
+        log(`${sDateTimeStamp} Read ${aId.length} Contas> _id: ${aId.join(",")}`);
+
+        resolve(rows);
+    } catch (err) {
+        reject(err);
+    }    
+});
+
+const openFolder = (isoDdate) => {
+    const date = DateTime.fromISO(isoDdate);
+    const folderPath = Path.join(__dirname, "..", "anexo", `${date.toFormat("yyyy.MM")}`);
+
+    shell.showItemInFolder(folderPath);
+}
+
 
 module.exports = {
     connect: connect,
+    openFolder: openFolder,
 
     getContas: getContas,
     getContasTipos: getContasTipos,
@@ -573,5 +647,7 @@ module.exports = {
     deleteLancamento: deleteLancamento,
     readConta: readConta,
     openAndParseFile: openAndParseFile,
-    parseFile: parseFile
+    parseFile: parseFile,
+    uploadAnexoFile: uploadAnexoFile,
+    getAnexoFiles: getAnexoFiles
 }

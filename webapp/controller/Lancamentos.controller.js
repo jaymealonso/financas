@@ -3,8 +3,8 @@ sap.ui.define([
 	"../model/formatter",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/core/Fragment",
-	"sap/m/MessageToast"
-], function(BaseController, formatter, JSONModel, Fragment, MessageToast) {
+	"sap/m/MessageBox"
+], function(BaseController, formatter, JSONModel, Fragment, MessageBox) {
 	"use strict";
 
 	return BaseController.extend("sap.ui.demo.basicTemplate.controller.Lancamentos", {
@@ -363,6 +363,43 @@ sap.ui.define([
 
 		onCategoriasFecharPress: function (oEvt) {
 			oEvt.getSource().getParent().close();
+		},
+
+		_loadAnexos: async function (idLancamento) {
+			var oRows = await this.webs.getAnexoFiles(idLancamento);
+			this.getView().setModel(new JSONModel(oRows), "anexos");			
+		},
+
+		onButtonAnexoPress: async function (oEvt) {
+			var oButton = oEvt.getSource();
+			var sPath = oButton.getParent().getBindingContextPath();
+			var oView = this.getView();
+
+			this.oLancamento = oView.getModel("lancamentos").getProperty(sPath);
+
+			await this._loadAnexos(this.oLancamento._id);
+			Fragment.load({
+				// id: oView.getId(),
+				name: "sap.ui.demo.basicTemplate.view.Lancamento-anexos",
+				controller: this
+			}).then(function (oPopover) {
+				oView.addDependent(oPopover);
+				oPopover.attachAfterClose(() => oPopover.destroy());
+				oPopover.openBy(oButton);
+			});
+		},
+
+		onUploadAnexo: function (oEvt) {
+			if (!this.oLancamento) return;
+
+			var that = this;
+			this.webs.uploadAnexoFile(this.oLancamento._id, this.oLancamento.data.toISOString())
+				.then((oValores) => that._loadAnexos(oValores.lancamento_id) )
+				.catch((err) => MessageBox.error(err) );
+		},
+
+		onOpenFolder: function (oEvt) {
+			this.webs.openFolder(this.oLancamento.data.toISOString());
 		}
 
 	});

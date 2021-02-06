@@ -77,7 +77,7 @@ npm install electron-rebuild
 - [ ] Importação de CSV
 - [ ] Importação em janela pop-up "Modal"
 ### Visão de arquivos anexo armazenados por Ano / Mes
-- [ ] Armazenamento de arquivos com ligação para Lançamentos
+- [X] Armazenamento de arquivos com ligação para Lançamentos
 - [ ] Navegação da "Visão de arquivos armazenados por Ano / Mes" para Lançamentos
 ## Talvez / infraestrutura
 - [ ] Portar frontend para fora do UI5

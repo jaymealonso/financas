@@ -10,8 +10,6 @@
     "startPT": "electron . --lang=pt-br",
     "startDPT": "electron . --lang=pt-br --inspect",
     "ef-start": "electron-forge start",
-    "server": "node -e \"require('./electron/server.js').startServer( )\"",
-    "startUI5": "ui5 serve",
     "electron": "electron .",
     "lint": "eslint webapp",
     "karma": "karma start",
@@ -38,6 +36,7 @@
     "dotenv": "^8.2.0",
     "electron-routes": "^1.3.0",
     "electron-squirrel-startup": "^1.0.0",
+    "luxon": "^1.25.0",
     "node-static": "^0.7.11",
     "xlsx": "^0.16.9"
   },

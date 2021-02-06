@@ -1,28 +1,29 @@
 /* eslint-disable strict */
+const { ipcMain, app, BrowserWindow } = require('electron');
 require('dotenv').config();
 const { join } = require('path');
-const { ipcMain, app, BrowserWindow } = require('electron');
-
-console.log(`Ambiente definido para: ${process.env.ENVIROMENT}`);
-var rootdir = process.env.ENVIROMENT === 'development' ? 'webapp' :  'dist'
-const ROOT_URL = join(__dirname, '..', rootdir, 'index.html');
-
-/* prevent App launching after install */
-if (require('electron-squirrel-startup')) app.quit();
-
-/* Create DB Structure - se não existir já */
 const db = require(join(__dirname, 'create_db.js'));
-db.createDataBaseFromFile();
-
-let mainWindow;
 /*
   // linha abaixo nao funciona, mas talvez no futuro
   app.commandLine.appendSwitch('lang', 'pt-br');
 */
 
-const createWindow = () => { 
+let mainWindow;
+
+const createWindow = async () => { 
   try {
+
+    /* prevent App launching after install */
+    if (require('electron-squirrel-startup')) return app.quit();
+
+    console.log(`Ambiente definido para: ${process.env.ENVIROMENT}`);
+    const rootdir = process.env.ENVIROMENT === 'dev' ? 'webapp' :  'dist'
+    const ROOT_URL = join(__dirname, '..', rootdir, 'index.html');
+
     console.log("> Locale: " + app.getLocale());
+
+    /* Create DB Structure - se não existir já */
+    db.createDataBaseFromFile();
 
     // Create the browser window.
     mainWindow = new BrowserWindow({
@@ -31,7 +32,6 @@ const createWindow = () => {
       webPreferences: {
         nodeIntegration: true
       }
-  //    show: false
     });
 
     mainWindow.show();
@@ -47,13 +47,14 @@ const createWindow = () => {
     console.log(new Date().toISOString() + `: Carregando pagina HTTP - loadURL: ` + ROOT_URL);
     mainWindow.loadURL(ROOT_URL);
     
-    // console.log(new Date().toISOString() + `: ABRE DEV Tools`);
-    // devtools = new BrowserWindow();
-    // mainWindow.webContents.setDevToolsWebContents(devtools.webContents);
-    // mainWindow.webContents.openDexevTools({ mode: 'detach' });  
-    
-  // nÃ£o funciona o codigo abaixo quando Ã© chamado da rede dentro da VM (fix acima)
-    // mainWindow.webContents.openDevTools();
+    if (process.env.OPEN_DEV_TOOLS === "true") {
+      console.log(new Date().toISOString() + `: ABRE DEV Tools`);
+      //devtools = new BrowserWindow();
+      //mainWindow.webContents.setDevToolsWebContents(devtools.webContents);
+      //mainWindow.webContents.openDexevTools({ mode: 'detach' });  
+      // nÃ£o funciona o codigo abaixo quando Ã© chamado da rede dentro da VM (fix acima)
+      mainWindow.webContents.openDevTools({ activate: false });
+    }
 
     mainWindow.on('closed', () => {
       mainWindow = null;
@@ -70,30 +71,6 @@ const createWindow = () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', createWindow);
-
-// const mainMenuTemplate = [
-//   { label: 'File', 
-//     submenu: [ 
-//       {
-//         label: '&Add Item',
-//         accelerator: 'Alt+a',
-//         click() {
-//           console.log("Abrir DEVTOOLS");
-//           mainWindow.webContents.openDevTools(); }
-//       },
-//       {
-//         label: '-'
-//       },
-//       {
-//         label: 'Sair',
-//         click() {
-//           app.quit();
-//         }
-//       },
-//   ] 
-//   },
-//   { label: 'DevTools' }  
-// ]
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
@@ -115,7 +92,6 @@ app.on('activate', () => {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
 //const ipc = app.ipcMain;
-
 ipcMain.on("go-back-button", () => {
   mainWindow.webContents.goBack(); 
 });

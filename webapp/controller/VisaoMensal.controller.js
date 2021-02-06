@@ -129,6 +129,7 @@ sap.ui.define([
 			this.webs.getLancamentos(
 				// eslint-disable-next-line camelcase
 				{ conta_id: this.sContaId, ano_mes: sAnoMes, categoria_id: sCategID }, 
+				undefined,
 				(values) => {
 					var oView = that.getView();
 					values.forEach((value) => value.changed = false);
