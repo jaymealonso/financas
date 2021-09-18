@@ -56,6 +56,12 @@ npm install electron-rebuild
 .\node_modules\.bin\electron-rebuild -w sqlite3 -p
 ```
 
+Outra alternativa, bão funcionou
+```
+"./node_modules/.bin/electron-rebuild -f -w sqlite3"
+```
+
+
 # Changelog
 - 2021-Adicionando "Roadmap / New features" e "Change log"
 # Roadmap / New features
@@ -71,6 +77,7 @@ npm install electron-rebuild
 - [ ] Filtros(Live) nos Lançamentos
 - [ ] Split de lançamentos em dois ou mais lançamentos com categorias próprias
 - [ ] Matching de lançamentos pre-existentes com categorias
+- [X] Apagar categorias que estejam vazias. 
 ### Importar arquivo extrato
 - [ ] Salvar configurações de importação (formato data/separador milhar/decimais)
 - [ ] Visão arquivo excel processado antes da importação

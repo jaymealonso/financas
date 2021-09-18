@@ -19,7 +19,7 @@ const connectToCreateDb = async () => new Promise((resolve, reject) => {
 });
 
 const readFile = async () => new Promise((resolve, reject) => {
-    fs.readFile(creationScriptFullPath, 'utf8', (err, contents) => {
+    return fs.readFile(creationScriptFullPath, 'utf8', (err, contents) => {
         console.log("Finalizou a leitura do arquivo");
         if (err) {
             console.log("Ocorreu um erro na leitura do arquivo de criação DB inicial.");
@@ -27,7 +27,7 @@ const readFile = async () => new Promise((resolve, reject) => {
             return reject(err);
         }
         // console.log("**** Conteudo Arquivo **** \n" + contents);
-        resolve(contents);
+        return resolve(contents);
     });
 });
 
@@ -44,12 +44,12 @@ const createDataBaseFromFile = () => new Promise( async (resolve, reject) => {
 
     let db = await connectToCreateDb();
     if (!db) {
-        reject();
+        return reject();
     }
 
     let contents = await readFile();
 
-    db.exec(
+    return db.exec(
         contents
     , (err) => {
         if (err) {

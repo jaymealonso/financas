@@ -55,6 +55,27 @@ const readConta = (sContaId, fnCallbackRender) => {
     fnCallbackRender(row);
 }
 
+const readCategoria = (idCategoria) => {
+    let sql = `
+        SELECT c.*
+        ,( SELECT count(*) 
+            FROM lancamento_categoria as lc 
+            WHERE lc.categoria_id = c._id  ) AS nro_lancamentos
+        FROM categorias as c
+        WHERE c._id = @categoria_id
+        ORDER BY c.nm_categoria
+    `;
+
+    let stmt = db.prepare(sql);
+    // eslint-disable-next-line camelcase
+    let row = stmt.get({categoria_id: idCategoria});
+    
+    var sDateTimeStamp = new Date().toISOString();
+    log(`${sDateTimeStamp} Read SINGLE Categoria> : ${JSON.stringify(row)}`);
+
+    return row;
+}
+
 function readLancamento(sLancId, fnCallbackRender) {
     let sql = 
         `select l.*
@@ -174,9 +195,14 @@ function getLancamentos(oObject, oLimOf, fnCallbackRender) {
 }
 
 function getCategorias (fnCallbackRender) {
-    let sql = 
-      `SELECT * FROM categorias
-       ORDER BY _id`;
+    let sql = `
+    SELECT c.*
+	,( select count(*) 
+		from lancamento_categoria as lc 
+		where lc.categoria_id = c._id  ) as nro_lancamentos
+    FROM categorias as c
+    ORDER BY c.nm_categoria
+    `;
 
     let stmt = db.prepare(sql);
     let rows = stmt.all();
@@ -324,23 +350,32 @@ const newConta = (oValores ,fnCallbackRender) => {
     fnCallbackRender(info);
 }
 
-function newCategoria(oValores ,fnCallbackRender) {
+const newCategoria = (oValores) => new Promise((resolve, reject) => {
     let sql = 
       `INSERT INTO categorias values (@id, @nm_categoria);`;
 
     let insert = db.prepare(sql);
-    let info = insert.run({
-        id: null, 
-        // eslint-disable-next-line camelcase
-        nm_categoria: oValores.nm_categoria
-    });
+    let info;
+    try {
+        info = insert.run({
+            id: null, 
+            // eslint-disable-next-line camelcase
+            nm_categoria: oValores.nm_categoria
+        });
+    } catch (err) {
+        if (err.code === "SQLITE_CONSTRAINT_UNIQUE") {
+            err.message = `Categoria com nome ${oValores.nm_categoria} já existe.`;
+        }
+
+        reject(err);
+    }
     if (info) {
         var sDateTimeStamp = new Date().toISOString();
         log( `${sDateTimeStamp} > INSERT Categoria: ${oValores.nm_categoria}` );
     }
   
-    fnCallbackRender(info);
-}
+    resolve(info);
+});
 
 function newLancamentoCategoria (sLancId, sCategId, fnCallbackRender) {
     let sql = 
@@ -492,6 +527,28 @@ function deleteLancamento (sConta, sLancId, fnCallbackRender) {
     fnCallbackRender(info);
 
 }
+const deleteCategoria = (idCategoria) => new Promise((resolve, reject) => {
+    const oCtgObject = readCategoria(idCategoria);
+    if (!oCtgObject) 
+        return reject(`Não foi encontrada categoria ${idCategoria}.`);
+    if (oCtgObject.nro_lancamentos > 0) 
+        return reject("Existem lançamentos associados a esta categoria, impossivel eliminar.");
+
+    let sql = `DELETE FROM categorias WHERE _id = @categoria_id`;
+
+    let cDelete = db.prepare(sql);
+    let info = cDelete.run({
+        // eslint-disable-next-line camelcase
+        categoria_id: idCategoria
+    });
+
+    if (info) {
+        var sDateTimeStamp = new Date().toISOString();
+        log(`${sDateTimeStamp} > DELETE Categoria ID: ${idCategoria}` );
+    }
+    return resolve();
+});
+
 
 function parseFile(oFile, fnCallbackRender) {
 
@@ -573,7 +630,6 @@ const uploadAnexoFile = (lancamento_id, data) => new Promise( async (resolve, re
         }
     );
 
-
     let oValues = {
         id: null, 
         // eslint-disable-next-line camelcase
@@ -595,7 +651,7 @@ const uploadAnexoFile = (lancamento_id, data) => new Promise( async (resolve, re
         oValues._id = info.lastInsertRowid;
     }
 
-    resolve(oValues);
+    return resolve(oValues);
 });
 
 const getAnexoFiles = (idLancamento) => new Promise( async (resolve, reject) => { 
@@ -606,6 +662,7 @@ const getAnexoFiles = (idLancamento) => new Promise( async (resolve, reject) => 
             `;
 
         let stmt = db.prepare(sql);
+        // eslint-disable-next-line camelcase
         let rows = stmt.all({lancamento_id: idLancamento});
 
         var sDateTimeStamp = new Date().toISOString();
@@ -645,7 +702,9 @@ module.exports = {
     changeLancamento: changeLancamento,
     deleteConta: deleteConta,
     deleteLancamento: deleteLancamento,
+    deleteCategoria: deleteCategoria,
     readConta: readConta,
+    readCategoria: readCategoria,
     openAndParseFile: openAndParseFile,
     parseFile: parseFile,
     uploadAnexoFile: uploadAnexoFile,

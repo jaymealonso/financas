@@ -62,8 +62,9 @@ const createWindow = async () => {
 
   //  const mainMenu = Menu.buildFromTemplate(mainMenuTemplate);
   //  Menu.setApplicationMenu(mainMenu);
+    return 1;
   } catch (err) {
-    app.quit();  
+    return app.quit();  
   }
 };
 

@@ -8,12 +8,16 @@
         </endButton>
         <content>
             <HBox>
-                <Input />
+                <Input>
+					<layoutData>
+						<FlexItemData growFactor="1" />
+					</layoutData>                
+                </Input>
                 <Button icon="sap-icon://add" press="onAddCategoriaPress" />
             </HBox>
-            <List items="{categorias>/}" mode="Delete">
+            <List items="{categorias>/}" mode="Delete" delete="onTableCategDelete">
                 <items>
-                    <StandardListItem title="{categorias>nm_categoria}" />
+                    <StandardListItem title="{categorias>nm_categoria}({categorias>nro_lancamentos})" />
                 </items>
             </List>
         </content>

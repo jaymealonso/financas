@@ -3,8 +3,9 @@ sap.ui.define([
 	"../model/formatter",
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/core/Fragment",
+	"sap/m/MessageToast",
 	"sap/m/MessageBox"
-], function(BaseController, formatter, JSONModel, Fragment, MessageBox) {
+], function(BaseController, formatter, JSONModel, Fragment, MessageToast, MessageBox) {
 	"use strict";
 
 	return BaseController.extend("sap.ui.demo.basicTemplate.controller.Lancamentos", {
@@ -243,21 +244,7 @@ sap.ui.define([
 						fnApprove();
 					}
 				);
-
-				// $.ajax("/conta/" + oObject.conta_id + "/lancamento/" + oObject._id, {
-				// 	method: "POST",
-				// 	data: oObject,
-				// 	success: function (values) {
-				// 		values.data = new Date(values.data);
-				// 		oModelLnc.setProperty(sPath, values);
-				// 		fnApprove();
-				// 	},
-				// 	error: function (err) {
-				// 		fnReject(err);
-				// 	}
-				// });
 			}).then(function () {
-
 				Fragment.load({
 					name: "sap.ui.demo.basicTemplate.view.Lancamento-display",
 					controller: that
@@ -266,7 +253,6 @@ sap.ui.define([
 	
 					that._replaceListItem(oListItem, oLancDisplay);
 				});		
-
 			});
 		},
 
@@ -347,18 +333,14 @@ sap.ui.define([
 			// eslint-disable-next-line camelcase
 			var oObject = { nm_categoria: oInput.getValue( ) };
 
-			that.webs.newCategoria(oObject, () => that._loadCategorias( ));
-
-			// $.ajax("/categorias", {
-			// 	method: "POST",
-			// 	data: oObject,
-			// 	success: function (values) {
-			// 		that._loadCategorias( );
-			// 	},
-			// 	error: function (err) {
-			// 		// fnReject(err);
-			// 	}
-			// });
+			that.webs.newCategoria(oObject)
+				.then(() => {
+					oInput.setValue("");
+					that._loadCategorias( );
+				})
+				.catch( (err) => 
+					MessageBox.error(err.message, { styleClass: 'sapUiSizeCompact' } )
+				);
 		},
 
 		onCategoriasFecharPress: function (oEvt) {
@@ -395,11 +377,34 @@ sap.ui.define([
 			var that = this;
 			this.webs.uploadAnexoFile(this.oLancamento._id, this.oLancamento.data.toISOString())
 				.then((oValores) => that._loadAnexos(oValores.lancamento_id) )
-				.catch((err) => MessageBox.error(err) );
-		},
+				.catch( (err) => 
+					MessageBox.error(err, { styleClass: 'sapUiSizeCompact' } )
+				);
+			},
 
 		onOpenFolder: function (oEvt) {
 			this.webs.openFolder(this.oLancamento.data.toISOString());
+		},
+		
+		onTableCategDelete: function (oEvt) {
+			var oListItem = oEvt.getParameter("listItem");
+			var oList = oListItem.getParent();
+			oList.setBusy(true);
+			var sPath = oListItem.getBindingContextPath()
+			var oModel = this.getView().getModel("categorias");
+			var oCategoria = oModel.getProperty(sPath);
+			this.webs.deleteCategoria(oCategoria._id)
+				.then( () => {
+					this._loadCategorias( );
+					oList.setBusy(false);
+					MessageToast.show(`Categoria ${oCategoria.nm_categoria} eliminada com sucesso.`);
+				})
+				.catch( (err )=> {
+					oList.setBusy(false);
+					MessageBox.error(err, {
+						styleClass: 'sapUiSizeCompact'
+					});
+				});
 		}
 
 	});
