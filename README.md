@@ -1,11 +1,11 @@
 
-# FinanÃƒÂ§as
+# Finanças
 
-## DiretÃƒÂ³rios 
-- ```db``` Arquivos de criaÃƒÂ§ÃƒÂ£o do banco de dados e o prÃƒÂ³prio banco
-- ```dist``` VersÃƒÂ£o compilada do aplicativo UI5 ```generated```
+## Diretórios 
+- ```db``` Arquivos de criação do banco de dados e o próprio banco
+- ```dist``` Versão compilada do aplicativo UI5 ```generated```
 - ```electron``` Codigo node do electron
-- ```out```  SaÃ­da do arquivo.exe "compilado" e instalador ```generated```
+- ```out```  Saída do arquivo.exe "compilado" e instalador ```generated```
 - ```webapp``` Codigo fonte do Web Application
 
 ## Funcionalidades principais para o build
@@ -21,31 +21,31 @@ Executar electron abrindo o popup do aplicativo de Desktop.
 npm start
 ```
 ### Build do UI5
-Faz o build parcial, sÃ³ com os arquivos do aplicativo, e deploy no diretÃƒÂ³rio ```./dist/```.
+Faz o build parcial, só com os arquivos do aplicativo, e deploy no diretório ```./dist/```.
 ```
 npm run-script build
 ```
-Faz o build completo ***incluindo das bibliotecas UI5*** (demora mais) e deploy no diretÃƒÂ³rio ```./dist/```.
+Faz o build completo ***incluindo das bibliotecas UI5*** (demora mais) e deploy no diretório ```./dist/```.
 ```
 npm run-script buildAll
 ```
 ### Build do ELECTRON-FORGE
-Faz o build completo do aplicativo e do instalador e coloca no diretÃ³rio ```./out/```
+Faz o build completo do aplicativo e do instalador e coloca no diretório ```./out/```
 ```
 npm run-script make
 ```
 A Definir
 
-## Como executar os testes unitÃƒÂ¡rios
+## Como executar os testes unitários
 
-NÃƒÂ£o existem teste unitÃƒÂ¡rio por enquanto.
+Não existem teste unitário por enquanto.
 
-## Erros e resoluÃƒÂ§ÃƒÂµes
+## Erros e resoluções
 ### DB Sqlite3:
 ### Caminho errado
 - Problema:
-  - Ao executar ```npm start``` dÃƒÂ¡ erro onde nÃƒÂ£o encontra o diretÃƒÂ³rio do SQLITE:
-- SoluÃ§Ã£o:
+  - Ao executar ```npm start``` dá erro onde não encontra o diretório do SQLITE:
+- Solução:
   - Temos que fazer o rebuid do electron incluindo o sqlite3
 
 ```
@@ -56,7 +56,7 @@ npm install electron-rebuild
 .\node_modules\.bin\electron-rebuild -w sqlite3 -p
 ```
 
-Outra alternativa, bÃ£o funcionou
+Outra alternativa, bão funcionou
 ```
 "./node_modules/.bin/electron-rebuild -f -w sqlite3"
 ```
@@ -66,30 +66,30 @@ Outra alternativa, bÃ£o funcionou
 - 2021-Adicionando "Roadmap / New features" e "Change log"
 # Roadmap / New features
 ## Funcionalidades Maiores / mais trabalho
-- [ ] CalendÃ¡rio de pagamentos
-- [ ] OrÃ§amento
-- [ ] VisÃ£o de arquivos armazenados por Ano / Mes e relaÃ§Ã£o com lanÃ§amento
+- [ ] Calendário de pagamentos
+- [ ] Orçamento
+- [ ] Visão de arquivos armazenados por Ano / Mes e relação com lançamento
 ## Funcionalidades menores / mais localizadas
-### VisÃ£o Mensal
-- [ ] Filtro de VisÃ£o Mensal por perÃ­odo de Mes-Ano atÃ© Mes-Ano
-### LanÃ§amentos
-- [ ] Filtro de lanÃ§amentos por perÃ­odo de Mes-Ano atÃ© Mes-Ano
-- [ ] Filtros(Live) nos LanÃ§amentos
-- [ ] Split de lanÃ§amentos em dois ou mais lanÃ§amentos com categorias prÃ³prias
-- [ ] Matching de lanÃ§amentos pre-existentes com categorias
+### Visão Mensal
+- [ ] Filtro de Visão Mensal por período de Mes-Ano até Mes-Ano
+### Lançamentos
+- [ ] Filtro de lançamentos por período de Mes-Ano até Mes-Ano
+- [ ] Filtros(Live) nos Lançamentos
+- [ ] Split de lançamentos em dois ou mais lançamentos com categorias próprias
+- [ ] Matching de lançamentos pre-existentes com categorias
 - [X] Apagar categorias que estejam vazias. 
 ### Importar arquivo extrato
-- [ ] Salvar configuraÃ§Ãµes de importaÃ§Ã£o (formato data/separador milhar/decimais)
-- [ ] VisÃ£o arquivo excel processado antes da importaÃ§Ã£o
-- [ ] ImportaÃ§Ã£o de CSV
-- [ ] ImportaÃ§Ã£o em janela pop-up "Modal"
-### VisÃ£o de arquivos anexo armazenados por Ano / Mes
-- [X] Armazenamento de arquivos com ligaÃ§Ã£o para LanÃ§amentos
-- [ ] NavegaÃ§Ã£o da "VisÃ£o de arquivos armazenados por Ano / Mes" para LanÃ§amentos
+- [ ] Salvar configurações de importação (formato data/separador milhar/decimais)
+- [ ] Visão arquivo excel processado antes da importação
+- [ ] Importação de CSV
+- [ ] Importação em janela pop-up "Modal"
+### Visão de arquivos anexo armazenados por Ano / Mes
+- [X] Armazenamento de arquivos com ligação para Lançamentos
+- [ ] Navegação da "Visão de arquivos armazenados por Ano / Mes" para Lançamentos
 ## Talvez / infraestrutura
 - [ ] Portar frontend para fora do UI5
 - [ ] Portar Banco de Dados para MongoDB
-- [ ] Portar app para NodeGUI (+ performance -tamanho arquivo app) (NodeGUI ainda estÃ¡ Beta com pequeno suporte a componentes avanÃ§ados)
+- [ ] Portar app para NodeGUI (+ performance -tamanho arquivo app) (NodeGUI ainda está Beta com pequeno suporte a componentes avançados)
 - [ ] Montar configuração de build para:
   - criar .env para dev/producao
   - criar splash de instalação
